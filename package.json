@@ -1,0 +1,25 @@
+{
+  "name": "nc_control",
+  "version": "1.0.0",
+  "description": "Projeto final do curso de Web Fullstack, voltado para gestão de Não Conformidade",
+  "keywords": [
+    "control",
+    "nc",
+    "qualidade"
+  ],
+  "homepage": "https://github.com/gabrielsilper/nc-control-backend#readme",
+  "bugs": {
+    "url": "https://github.com/gabrielsilper/nc-control-backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielsilper/nc-control-backend.git"
+  },
+  "license": "ISC",
+  "author": "Gabriel Pereira, Lorena Silva, Suriel Gomes",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
