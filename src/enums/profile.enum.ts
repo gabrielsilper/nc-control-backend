@@ -1,6 +1,6 @@
-enum Profile {
+export enum Profile {
     VISITANTE,
     OPERADOR,
-    TECNICO,
+    RESPONSAVEL,
     GESTOR
 }
