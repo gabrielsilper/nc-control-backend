@@ -1,3 +1,4 @@
+import { Profile } from "enums/profile.enum";
 import {
   Column,
   CreateDateColumn,
@@ -20,12 +21,12 @@ export default class User {
   @Column({ type: "text", nullable: false })
   email!: string;
 
-  @Column({ type: "enum", nullable: false, enum: Profile, default: Profile.VISITANTE })
+  @Column({ type: "enum", nullable: false, enum: Profile })
   profile!: Profile;
 
-  @CreateDateColumn()
-  createDate!: Date;
+  @CreateDateColumn({ name: "created_at" })
+  createdAt!: Date;
 
-  @UpdateDateColumn()
-  updateDate!: Date;
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt!: Date;
 }

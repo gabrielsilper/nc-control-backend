@@ -1,7 +1,7 @@
-export enum TypeNc{
-    PRODUTO,
-    PROCESSO,
-    MATERIAL,
-    SEGURANÇA,
-    OUTRO
+export enum TypeNc {
+  PRODUTO,
+  PROCESSO,
+  MATERIAL,
+  SEGURANÇA,
+  OUTRO,
 }

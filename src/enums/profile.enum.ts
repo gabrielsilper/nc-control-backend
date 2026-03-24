@@ -1,6 +1,5 @@
 export enum Profile {
-    VISITANTE,
-    OPERADOR,
-    RESPONSAVEL,
-    GESTOR
+  OPERADOR,
+  RESPONSAVEL,
+  GESTOR,
 }

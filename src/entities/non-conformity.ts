@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
 } from "typeorm";
 
-@Entity('non-conformity')
+@Entity('non-conformities')
 export default class NonConformity{
     @PrimaryGeneratedColumn("uuid")
     id!: number;

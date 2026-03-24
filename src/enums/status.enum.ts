@@ -1,5 +1,5 @@
-enum Status{
-    PENDENTE,
-    EM_ANDAMENTO,
-    CONCLUIDA
+enum Status {
+  PENDENTE,
+  EM_ANDAMENTO,
+  CONCLUIDA,
 }
