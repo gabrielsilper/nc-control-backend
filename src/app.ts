@@ -2,7 +2,9 @@ import 'reflect-metadata';
 import { appDataSource } from 'database/app-data-source';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import { errorHandler } from 'middlewares/error-handler.middleware';
 import morgan from 'morgan';
+import indexRoutes from 'routes/index.routes';
 import type { DataSource } from 'typeorm';
 
 export default class App {
@@ -34,11 +36,11 @@ export default class App {
     this.server.get('/api/v1/live', (_req, res) => {
       res.send('Non Conformity Control v1 is live!');
     });
-    // this.server.use('/api/v1', indexRouter);
+    this.server.use('/api/v1', indexRoutes);
   }
 
   private errorHandling(): void {
-    // this.server.use(errorHandler)
+    this.server.use(errorHandler);
   }
 
   public start(PORT: string | number): void {
