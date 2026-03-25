@@ -1,0 +1,8 @@
+export enum StatusNc{
+    ABERTA, 
+    EM_TRABALHO,
+    AGUARDANDO,
+    VERIFICACAO,
+    ENCERRADA,
+    CANCELADA
+}
