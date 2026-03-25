@@ -1,14 +1,17 @@
+import 'reflect-metadata';
+import { appDataSource } from 'database/app-data-source';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
+import type { DataSource } from 'typeorm';
 
 export default class App {
   public readonly server: express.Express;
-  //   public readonly db: DataSource;
+  public readonly db: DataSource;
 
   constructor() {
     this.server = express();
-    // this.db = appDataSource;
+    this.db = appDataSource;
     this.config();
     this.routes();
     this.errorHandling();
@@ -38,17 +41,17 @@ export default class App {
     // this.server.use(errorHandler)
   }
 
-  public start(_PORT: string | number): void {
-    // this.db
-    //   .initialize()
-    //   .then(() => {
-    //     console.log('Initialized database connection successfully.');
-    //     this.server.listen(PORT, () => {
-    //       console.log(`Server is running on port ${PORT}`);
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error connecting to the database:', error);
-    //   });
+  public start(PORT: string | number): void {
+    this.db
+      .initialize()
+      .then(() => {
+        console.log('Initialized database connection successfully.');
+        this.server.listen(PORT, () => {
+          console.log(`Server is running on port ${PORT}`);
+        });
+      })
+      .catch((error) => {
+        console.error('Error connecting to the database:', error);
+      });
   }
 }
