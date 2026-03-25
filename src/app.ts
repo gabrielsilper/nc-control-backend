@@ -32,7 +32,7 @@ export default class App {
 
   private routes(): void {
     this.server.get('/api/v1/live', (_req, res) => {
-      res.send('Mundo Geek v1 is live!');
+      res.send('Non Conformity Control v1 is live!');
     });
     // this.server.use('/api/v1', indexRouter);
   }
