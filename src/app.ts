@@ -1,10 +1,10 @@
 import express from 'express';
-import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 
 export default class App {
   public readonly server: express.Express;
-//   public readonly db: DataSource;
+  //   public readonly db: DataSource;
 
   constructor() {
     this.server = express();
@@ -28,7 +28,7 @@ export default class App {
   }
 
   private routes(): void {
-    this.server.get('/api/v1/live', (req, res) => {
+    this.server.get('/api/v1/live', (_req, res) => {
       res.send('Mundo Geek v1 is live!');
     });
     // this.server.use('/api/v1', indexRouter);
@@ -38,7 +38,7 @@ export default class App {
     // this.server.use(errorHandler)
   }
 
-  public start(PORT: string | number): void {
+  public start(_PORT: string | number): void {
     // this.db
     //   .initialize()
     //   .then(() => {
