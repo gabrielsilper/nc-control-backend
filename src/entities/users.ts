@@ -3,9 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import NonConformity from './non-conformity';
+
 
 @Entity('users')
 export default class User {
@@ -29,4 +33,11 @@ export default class User {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  //RELACIONAMENTO COM A ENTIDADE NON CONFORMITY
+  @OneToMany (() => NonConformity, (nc) => nc.createdBy)
+  createdNonConformities!: NonConformity[];
+
+  @OneToMany(() => NonConformity, (nc) => nc.assignedTo)
+  assignedNonConformities!: NonConformity[];
 }
