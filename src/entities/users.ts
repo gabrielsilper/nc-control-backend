@@ -43,4 +43,9 @@ export default class User {
     (nc) => nc.assignedTo,
   )
   assignedNonConformities!: NonConformity[];
+
+  toDto() {
+    const { password, ...user } = this;
+    return user;
+  }
 }
