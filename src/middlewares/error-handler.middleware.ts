@@ -1,13 +1,24 @@
+import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
+import { UserNotFoundError } from 'errors/user-not-found.error';
 import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
 // TODO - Colocar uma criação de log desse erros com winston e criar um tabela para armazenar as informações
-export function errorHandler(
-  error: Error,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
-) {
+export function errorHandler(error: Error, _req: Request, res: Response, _next: NextFunction) {
+  if (error instanceof UserNotFoundError) {
+    return res.status(404).json({
+      error: error.name,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof EmailAlreadyExistsError) {
+    return res.status(409).json({
+      error: error.name,
+      message: error.message,
+    });
+  }
+
   if (error instanceof ZodError) {
     return res.status(400).json({
       message: 'Validation error',
