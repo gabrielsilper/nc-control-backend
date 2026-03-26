@@ -33,11 +33,26 @@ export default class NonConformity {
   @Column({ type: "text", nullable: false})
   Department!: string;
 
-  @ManyToOne (() => User, (user) => user.createdNonConformities)
-  createdBy!: User;
+  //RELACIONAMENTO COM A ENTIDADE USERS
+
+   @ManyToOne (() => User, (user) => user.createdNonConformities)
+  createdBy!: User; //criador
 
   @ManyToOne(() => User, (user) => user.assignedNonConformities, { nullable: true })
-  assignedTo!: User;
+  assignedTo!: User; // Responsável
+
+  
+  @Column({ type: 'timestamptz', default: () => 'NOW()' })
+  openedAt!: Date; // Momento do registro
+
+  @Column({ type: 'timestamptz', nullable: true })
+  dueDate!: Date; // Prazo máximo para encerramento
+
+  @Column({ type: 'timestamptz', nullable: true })
+  closedAt!: Date; // Momento do encerramento efetivo
+
+  @Column({ type: 'text', nullable: true })
+  rootCause!: string; // Descrição da causa raiz identificada
 
 }
 
