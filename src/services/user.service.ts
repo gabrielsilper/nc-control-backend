@@ -4,7 +4,7 @@ import IEncrypterService from 'interfaces/encrypter-service';
 import UserRepository from 'repositories/user.repository';
 import User from '../entities/users';
 import { CreateUserDTO } from '../schemas/create-user.schema';
-import { UpdateUserDTO, updateUserSchema } from '../schemas/update-user.schema';
+import { UpdateUserDTO } from '../schemas/update-user.schema';
 
 export default class UserService {
   constructor(

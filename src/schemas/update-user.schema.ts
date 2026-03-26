@@ -3,34 +3,34 @@ import { Profile } from '../enums/profile.enum';
 
 export const updateUserSchema = z.object({
   name: z
-    .string('Name must be a string')
-    .min(3, 'Name must have at least 3 characters')
-    .max(50, 'Name must have at most 50 characters')
-    .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
+    .string('name deve ser uma string')
+    .min(3, 'name deve ter no mínimo 3 caracteres')
+    .max(50, 'name deve ter no máximo 50 caracteres')
+    .regex(/^[a-zA-Z\s]+$/, 'name pode conter apenas letras e espaços')
     .optional(),
 
   password: z
-    .string('Password must be a string')
-    .min(8, 'Password must have at least 8 characters')
-    .max(25, 'Password must have at most 25 characters')
+    .string('password deve ser uma string')
+    .min(8, 'password deve ter no mínimo 8 caracteres')
+    .max(25, 'password deve ter no máximo 25 caracteres')
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/,
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+      'password deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial',
     )
     .optional(),
 
   email: z
-    .string('Email must be a string')
+    .string('E-mail deve ser uma string')
     .regex(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      'Email must be a valid email address',
+      'E-mail deve ser um endereço de e-mail válido',
     )
     .optional(),
 
   profile: z
     .enum(Profile, {
       message:
-        'Profile must be a valid enum value: 0 - OPERADOR, 1 - RESPONSAVEL, 2- GESTOR',
+        'profile deve ser um valor de enum válido: 0 - OPERADOR, 1 - RESPONSÁVEL, 2 - GESTOR',
     })
     .optional(),
 });

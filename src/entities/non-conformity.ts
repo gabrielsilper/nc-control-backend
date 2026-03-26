@@ -59,12 +59,12 @@ export default class NonConformity {
   @JoinColumn({ name: 'assigned_to' })
   assignedTo!: User;
 
-  @Column({ type: 'timestamptz', default: () => 'NOW()', name: 'opened_at' })
+  @Column({ type: 'timestamp', default: () => 'NOW()', name: 'opened_at' })
   openedAt!: Date;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'due_date' })
+  @Column({ type: 'timestamp', nullable: true, name: 'due_date' })
   dueDate!: Date;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
+  @Column({ type: 'timestamp', nullable: true, name: 'closed_at' })
   closedAt!: Date;
 }
