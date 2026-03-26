@@ -1,7 +1,13 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import User from './users';
 
 @Entity('non-conformities')
@@ -21,38 +27,44 @@ export default class NonConformity {
   @Column({ type: 'enum', nullable: false, enum: TypeNc })
   type!: TypeNc;
 
-  @Column({ type: "enum", nullable: false, enum: SeverityNc  })
-  Severity!: SeverityNc;
+  @Column({ type: 'enum', nullable: false, enum: SeverityNc })
+  severity!: SeverityNc;
 
-  @Column({ type: "enum", nullable: false, enum: StatusNc  })
-  Status!: StatusNc;
+  @Column({ type: 'enum', nullable: false, enum: StatusNc })
+  status!: StatusNc;
 
-  @Column({ type: "text", nullable: false})
-  Process_line!: string;
+  @Column({ type: 'text', nullable: false })
+  process_line!: string;
 
-  @Column({ type: "text", nullable: false})
-  Department!: string;
-
-  //RELACIONAMENTO COM A ENTIDADE USERS
-
-   @ManyToOne (() => User, (user) => user.createdNonConformities)
-  createdBy!: User; //criador
-
-  @ManyToOne(() => User, (user) => user.assignedNonConformities, { nullable: true })
-  assignedTo!: User; // Responsável
-
-  
-  @Column({ type: 'timestamptz', default: () => 'NOW()' })
-  openedAt!: Date; // Momento do registro
-
-  @Column({ type: 'timestamptz', nullable: true })
-  dueDate!: Date; // Prazo máximo para encerramento
-
-  @Column({ type: 'timestamptz', nullable: true })
-  closedAt!: Date; // Momento do encerramento efetivo
+  @Column({ type: 'text', nullable: false })
+  department!: string;
 
   @Column({ type: 'text', nullable: true })
-  rootCause!: string; // Descrição da causa raiz identificada
+  rootCause!: string;
 
+  @ManyToOne(
+    () => User,
+    (user) => user.createdNonConformities,
+  )
+  @JoinColumn({ name: 'created_by' })
+  createdBy!: User;
+
+  @ManyToOne(
+    () => User,
+    (user) => user.assignedNonConformities,
+    {
+      nullable: true,
+    },
+  )
+  @JoinColumn({ name: 'assigned_to' })
+  assignedTo!: User;
+
+  @Column({ type: 'timestamptz', default: () => 'NOW()', name: 'opened_at' })
+  openedAt!: Date;
+
+  @Column({ type: 'timestamptz', nullable: true, name: 'due_date' })
+  dueDate!: Date;
+
+  @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
+  closedAt!: Date;
 }
-

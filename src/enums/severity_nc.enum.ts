@@ -1,6 +1,6 @@
-export enum SeverityNc{
-    BAIXA, 
-    MEDIA,
-    ALTA,
-    CRITICA
+export enum SeverityNc {
+  BAIXA,
+  MEDIA,
+  ALTA,
+  CRITICA,
 }
