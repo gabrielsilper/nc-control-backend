@@ -1,9 +1,10 @@
-import UserCreateDTO from 'dtos/user-create.dto';
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { UserNotFoundError } from 'errors/user-not-found.error';
 import IEncrypterService from 'interfaces/encrypter-service';
 import UserRepository from 'repositories/user.repository';
 import User from '../entities/users';
+import { CreateUserDTO } from '../schemas/create-user.schema';
+import { UpdateUserDTO, updateUserSchema } from '../schemas/update-user.schema';
 
 export default class UserService {
   constructor(
@@ -25,7 +26,7 @@ export default class UserService {
     return user;
   }
 
-  async create(userData: UserCreateDTO): Promise<User> {
+  async create(userData: CreateUserDTO): Promise<User> {
     const userExists = await this.userRepository.findOneBy({
       email: userData.email,
     });
@@ -41,7 +42,7 @@ export default class UserService {
     return this.userRepository.save(user);
   }
 
-  async update(id: string, userData: Partial<User>): Promise<User> {
+  async update(id: string, userData: UpdateUserDTO): Promise<User> {
     const user = await this.findById(id);
 
     if (userData.password) {
