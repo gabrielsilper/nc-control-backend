@@ -56,6 +56,6 @@ export default class UserService {
 
   async delete(id: string): Promise<void> {
     const user = await this.findById(id);
-    await this.userRepository.delete(user);
+    await this.userRepository.remove(user);
   }
 }
