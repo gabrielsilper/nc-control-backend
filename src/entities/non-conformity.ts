@@ -27,13 +27,13 @@ export default class NonConformity {
   @Column({ type: 'enum', nullable: false, enum: StatusNc })
   status!: StatusNc;
 
-  @Column({ type: 'text', nullable: false })
-  process_line!: string;
+  @Column({ type: 'text', nullable: false,name: 'process_line' })
+  processLine!: string;
 
   @Column({ type: 'text', nullable: false })
   department!: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'root_cause' })
   rootCause?: string;
 
   @Index()

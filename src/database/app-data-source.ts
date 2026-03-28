@@ -1,5 +1,6 @@
 import CorrectiveAction from 'entities/corrective-action';
 import NonConformity from 'entities/non-conformity';
+import RefreshToken from 'entities/refresh-token';
 import User from 'entities/user';
 import { DataSource } from 'typeorm';
 
@@ -11,7 +12,7 @@ export const appDataSource = new DataSource({
   password: process.env.DB_PASS as string,
   database: process.env.DB_NAME as string,
 
-  entities: [CorrectiveAction, NonConformity, User],
+  entities: [CorrectiveAction, NonConformity, User, RefreshToken],
 
   logging: true,
   synchronize: process.env.NODE_ENV !== 'production',
