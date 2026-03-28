@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import User from './users';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import User from './user';
 
 @Entity('refresh_tokens')
 export default class RefreshToken {
@@ -9,21 +9,29 @@ export default class RefreshToken {
   @Column({ type: 'varchar', unique: true, nullable: false })
   token!: string;
 
+  @Index()
+  @Column({ type: 'uuid', name: 'user_id' })
+  userID!: string;
+
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamptz', nullable: false })
   expirationDate!: Date;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
+  userAgent?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  ipAddress?: string;
+
+  @CreateDateColumn({ type: 'timestamptz', nullable: false })
   createdAt!: Date;
-
-  @Column({ type: 'varchar', nullable: true })
-  userAgent!: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  ipAddress!: string | null;
 
   @Column({ type: 'boolean', default: false })
   revoked!: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true, name: 'revoked_at' })
+  revokedAt?: Date;
 }

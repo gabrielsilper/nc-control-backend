@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import NonConformity from './non-conformity';
+import RefreshToken from './refresh-token';
 
 @Entity('users')
 export default class User {
@@ -26,11 +27,17 @@ export default class User {
   @Column({ type: 'enum', nullable: false, enum: Profile })
   profile!: Profile;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
   updatedAt!: Date;
+
+  @OneToMany(
+    () => RefreshToken,
+    (refreshToken) => refreshToken.user,
+  )
+  refreshTokens!: RefreshToken[];
 
   @OneToMany(
     () => NonConformity,
