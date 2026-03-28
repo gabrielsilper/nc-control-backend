@@ -3,13 +3,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import NonConformity from './non-conformity';
-import User from './users';
+import User from './user';
 
 @Entity('corrective_actions')
 export default class CorrectiveAction {
@@ -27,26 +28,34 @@ export default class CorrectiveAction {
   })
   status!: string;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamptz', nullable: false })
   deadline!: Date;
 
   @Column({ type: 'text', nullable: true })
   evidence?: string;
 
+  @Index()
+  @Column({ type: 'uuid', name: 'nc_id' })
+  nonConformityId!: string;
+
   @ManyToOne(() => NonConformity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'nc_id' })
   nonConformity!: NonConformity;
 
+  @Index()
+  @Column({ type: 'uuid', name: 'assignee_id' })
+  assigneeId!: string;
+
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'assignee_id' })
   assignee!: User;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'finished_at' })
+  @Column({ type: 'timestamptz', nullable: true, name: 'finished_at' })
   finishedAt?: Date;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
   updatedAt!: Date;
 }

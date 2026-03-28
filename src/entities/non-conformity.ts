@@ -1,19 +1,13 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import User from './users';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import User from './user';
 
 @Entity('non-conformities')
 export default class NonConformity {
   @PrimaryGeneratedColumn('uuid')
-  id!: number;
+  id!: string;
 
   @Column({ type: 'varchar', nullable: false })
   number!: string;
@@ -40,7 +34,11 @@ export default class NonConformity {
   department!: string;
 
   @Column({ type: 'text', nullable: true })
-  rootCause!: string;
+  rootCause?: string;
+
+  @Index()
+  @Column({ type: 'uuid', name: 'created_by' })
+  createdById!: string;
 
   @ManyToOne(
     () => User,
@@ -48,6 +46,10 @@ export default class NonConformity {
   )
   @JoinColumn({ name: 'created_by' })
   createdBy!: User;
+
+  @Index()
+  @Column({ type: 'uuid', nullable: true, name: 'assigned_to' })
+  assignedToId?: string;
 
   @ManyToOne(
     () => User,
@@ -57,14 +59,14 @@ export default class NonConformity {
     },
   )
   @JoinColumn({ name: 'assigned_to' })
-  assignedTo!: User;
+  assignedTo?: User | null;
 
-  @Column({ type: 'timestamp', default: () => 'NOW()', name: 'opened_at' })
+  @Column({ type: 'timestamptz', default: () => 'NOW()', name: 'opened_at' })
   openedAt!: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'due_date' })
-  dueDate!: Date;
+  @Column({ type: 'timestamptz', nullable: true, name: 'due_date' })
+  dueDate?: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'closed_at' })
-  closedAt!: Date;
+  @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
+  closedAt?: Date;
 }

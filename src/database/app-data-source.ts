@@ -1,6 +1,6 @@
 import CorrectiveAction from 'entities/corrective-action';
 import NonConformity from 'entities/non-conformity';
-import User from 'entities/users';
+import User from 'entities/user';
 import { DataSource } from 'typeorm';
 
 export const appDataSource = new DataSource({

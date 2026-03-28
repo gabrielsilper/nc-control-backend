@@ -2,7 +2,7 @@ import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { UserNotFoundError } from 'errors/user-not-found.error';
 import IEncrypterService from 'interfaces/encrypter-service';
 import UserRepository from 'repositories/user.repository';
-import User from '../entities/users';
+import User from '../entities/user';
 import { CreateUserDTO } from '../schemas/create-user.schema';
 import { UpdateUserDTO } from '../schemas/update-user.schema';
 

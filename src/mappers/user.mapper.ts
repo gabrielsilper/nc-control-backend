@@ -1,5 +1,5 @@
 import ResponseUserDTO from 'dtos/response-user.dto';
-import User from 'entities/users';
+import User from 'entities/user';
 
 export function userToResponseDto(user: User): ResponseUserDTO {
   return {
