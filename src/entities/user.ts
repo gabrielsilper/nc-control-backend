@@ -1,12 +1,5 @@
 import { Profile } from 'enums/profile.enum';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import NonConformity from './non-conformity';
 import RefreshToken from './refresh-token';
 

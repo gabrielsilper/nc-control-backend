@@ -26,6 +26,10 @@ export default class UserService {
     return user;
   }
 
+  findByEmail(email: string) {
+    return this.userRepository.findOneBy({ email });
+  }
+
   async create(userData: CreateUserDTO): Promise<User> {
     const userExists = await this.userRepository.findOneBy({
       email: userData.email,

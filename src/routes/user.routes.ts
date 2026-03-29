@@ -1,11 +1,11 @@
 import { Router } from 'express';
+import { validateBody } from 'middlewares/validate-body.middleware';
+import { createUserSchema } from 'schemas/create-user.schema';
+import { updateUserSchema } from 'schemas/update-user.schema';
 import UserController from '../controllers/user.controller';
 import UserRepository from '../repositories/user.repository';
 import UserService from '../services/user.service';
 import Bcrypt from '../utils/bcrypt';
-import { validateBody } from 'middlewares/validate-body';
-import { createUserSchema } from 'schemas/create-user.schema';
-import { updateUserSchema } from 'schemas/update-user.schema';
 
 const encrypter = new Bcrypt();
 const userRepository = new UserRepository();

@@ -27,7 +27,7 @@ export default class NonConformity {
   @Column({ type: 'enum', nullable: false, enum: StatusNc })
   status!: StatusNc;
 
-  @Column({ type: 'text', nullable: false,name: 'process_line' })
+  @Column({ type: 'text', nullable: false, name: 'process_line' })
   processLine!: string;
 
   @Column({ type: 'text', nullable: false })
