@@ -21,16 +21,12 @@ export const updateUserSchema = z.object({
 
   email: z
     .string('E-mail deve ser uma string')
-    .regex(
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      'E-mail deve ser um endereço de e-mail válido',
-    )
+    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'E-mail deve ser um endereço de e-mail válido')
     .optional(),
 
   profile: z
     .enum(Profile, {
-      message:
-        'profile deve ser um valor de enum válido: 0 - OPERADOR, 1 - RESPONSÁVEL, 2 - GESTOR',
+      message: 'profile deve ser um valor de enum válido: 0 - OPERADOR, 1 - RESPONSÁVEL, 2 - GESTOR',
     })
     .optional(),
 });

@@ -1,7 +1,14 @@
-import type { AccessTokenPayload, RefreshTokenPayload } from './token-payload';
+import { Profile } from 'enums/profile.enum';
 
 export default interface ITokenService {
-  generate(payload: AccessTokenPayload | RefreshTokenPayload): string;
+  generateAcessToken(payload: AccessTokenPayload): string;
   verifyAccessToken(token: string): AccessTokenPayload;
-  verifyRefreshToken(token: string): RefreshTokenPayload;
+  generateOpaqueToken(): string;
+  hashToken(token: string): string;
+}
+
+export interface AccessTokenPayload {
+  sub: string;
+  email: string;
+  profile: Profile;
 }
