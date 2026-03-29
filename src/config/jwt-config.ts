@@ -1,16 +1,9 @@
 import type { SignOptions } from 'jsonwebtoken';
+import { getEnvOrThrow } from './environment';
 
 interface JwtConfig {
   secret: string;
   expiresIn: SignOptions['expiresIn'];
-}
-
-function getEnvOrThrow(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Variável de ambiente ${name} não definida`);
-  }
-  return value;
 }
 
 const jwtConfig: JwtConfig = {

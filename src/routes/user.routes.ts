@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateBody } from 'middlewares/validate-body';
+import { validateBody } from 'middlewares/validate-body.middleware';
 import { createUserSchema } from 'schemas/create-user.schema';
 import { updateUserSchema } from 'schemas/update-user.schema';
 import UserController from '../controllers/user.controller';

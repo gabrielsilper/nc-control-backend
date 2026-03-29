@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import User from './user';
 
 @Entity('refresh_tokens')
@@ -11,7 +20,7 @@ export default class RefreshToken {
 
   @Index()
   @Column({ type: 'uuid', name: 'user_id' })
-  userID!: string;
+  userId!: string;
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
@@ -28,6 +37,9 @@ export default class RefreshToken {
 
   @CreateDateColumn({ type: 'timestamptz', nullable: false, name: 'created_at' })
   createdAt!: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', name: 'last_refresh' })
+  lastRefresh!: Date;
 
   @Column({ type: 'boolean', default: false })
   revoked!: boolean;
