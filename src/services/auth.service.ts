@@ -37,4 +37,41 @@ export default class AuthService {
     const refreshToken = await this.refreshTokenService.create(user.id, userAgent, ipAddress);
     return { accessToken, refreshToken };
   }
+
+  async refresh(refreshToken: string, userAgent: string, ipAddress: string): Promise<ResponseTokensDTO> {
+    const storedToken = await this.refreshTokenService.findByToken(refreshToken); //busca no bd o token
+
+    if (!storedToken) {
+      throw new InvalidCredentialsError();
+    }
+
+    if (storedToken.userAgent !== userAgent) {
+      throw new InvalidCredentialsError();
+    }
+
+    // Valida expiração 
+    if (storedToken.expirationDate < new Date()) {
+      throw new InvalidCredentialsError();
+    }
+
+  // Novo access token
+  const accessToken = this.tokenService.generateAcessToken({
+    sub: storedToken.userId,
+    email: storedToken.user.email,
+    profile: storedToken.user.profile,
+  });
+
+  // invalida o antigo token e assume o novo
+  const newRefreshToken = await this.refreshTokenService.refresh(
+    storedToken,
+    ipAddress,
+  );
+
+  return {
+    accessToken,
+    refreshToken: newRefreshToken,
+  };
+}
+
+  
 }
