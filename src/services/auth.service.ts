@@ -49,29 +49,24 @@ export default class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    // Valida expiração 
+    // Valida expiração
     if (storedToken.expirationDate < new Date()) {
       throw new InvalidCredentialsError();
     }
 
-  // Novo access token
-  const accessToken = this.tokenService.generateAcessToken({
-    sub: storedToken.userId,
-    email: storedToken.user.email,
-    profile: storedToken.user.profile,
-  });
+    // Novo access token
+    const accessToken = this.tokenService.generateAcessToken({
+      sub: storedToken.userId,
+      email: storedToken.user.email,
+      profile: storedToken.user.profile,
+    });
 
-  // invalida o antigo token e assume o novo
-  const newRefreshToken = await this.refreshTokenService.refresh(
-    storedToken,
-    ipAddress,
-  );
+    // invalida o antigo token e assume o novo
+    const newRefreshToken = await this.refreshTokenService.refresh(storedToken, ipAddress);
 
-  return {
-    accessToken,
-    refreshToken: newRefreshToken,
-  };
-}
-
-  
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
+  }
 }

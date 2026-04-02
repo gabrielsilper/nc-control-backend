@@ -57,11 +57,10 @@ export default class RefreshTokenService {
   }
 
   async findByToken(token: string) {
-  const hashedToken = this.tokenService.hashToken(token);
+    const hashedToken = this.tokenService.hashToken(token);
 
-  return this.refreshTokenRepository.findOne({
-    where: { token: hashedToken },
-    relations: ['user'], 
-  });
-}
+    return this.refreshTokenRepository.findOne({
+      where: { token: hashedToken },
+    });
+  }
 }
