@@ -3,6 +3,8 @@ import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import UserService from './user.service';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
+import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
+import { StatusNc } from 'enums/status_nc.enum';
 
 export default class NonConformityService {
   constructor(
@@ -41,5 +43,43 @@ export default class NonConformityService {
     }
 
     return nonConformity;
+  }
+
+  async update(id: string, nonConformityData: UpdateNonConformityDTO) {
+    const nonConformity = await this.findById(id);
+
+    const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, nonConformityData);
+
+    return this.nonConformityRepository.save(UpdatedNonConformity);
+  }
+
+  async updateStatus(id: string, status: StatusNc) {
+    const nonConformity = await this.findById(id);
+
+    nonConformity.status = status;
+
+    return this.nonConformityRepository.save(nonConformity);
+  }
+
+  async updateAssigne(id: string, userId: string) {
+    const nonConformity = await this.findById(id);
+
+    nonConformity.assignedToId = userId;
+
+    return this.nonConformityRepository.save(nonConformity);
+  }
+
+  async updateDueDate(id: string, dueDate: Date) {
+    const nonConformity = await this.findById(id);
+
+    nonConformity.dueDate = dueDate;
+
+    return this.nonConformityRepository.save(nonConformity);
+  }
+
+  async finish(id: string) {
+    await this.findById(id);
+
+    await this.nonConformityRepository.update({ id }, { status: StatusNc.ENCERRADA, closedAt: () => 'CURRENT_TIMESTAMP' });
   }
 }
