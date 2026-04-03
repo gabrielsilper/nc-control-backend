@@ -9,15 +9,9 @@ export const updateNonConformitySchema = z.object({
     .regex(/^NC-\d{4}-\d{6}$/, 'number deve seguir o padrão NC-0000-000000. Exemplo: NC-1234-123456')
     .optional(),
 
-  title: z
-    .string('title deve ser uma string')
-    .min(3, 'title deve ter no mínimo 3 caracteres')
-    .optional(),
+  title: z.string('title deve ser uma string').min(3, 'title deve ter no mínimo 3 caracteres').optional(),
 
-  description: z
-    .string('description deve ser uma string')
-    .min(3, 'description deve ter no mínimo 3 caracteres')
-    .optional(),
+  description: z.string('description deve ser uma string').min(3, 'description deve ter no mínimo 3 caracteres').optional(),
 
   type: z
     .enum(TypeNc, {
@@ -38,25 +32,13 @@ export const updateNonConformitySchema = z.object({
     })
     .optional(),
 
-  processLine: z
-    .string('processLine deve ser uma string')
-    .min(3, 'processLine deve ter no mínimo 3 caracteres')
-    .optional(),
+  processLine: z.string('processLine deve ser uma string').min(3, 'processLine deve ter no mínimo 3 caracteres').optional(),
 
-  department: z
-    .string('department deve ser uma string')
-    .min(3, 'department deve ter no mínimo 3 caracteres')
-    .optional(),
+  department: z.string('department deve ser uma string').min(3, 'department deve ter no mínimo 3 caracteres').optional(),
 
-  rootCause: z
-    .string('rootCause deve ser uma string')
-    .min(3, 'rootCause deve ter no mínimo 3 caracteres')
-    .optional(),
+  rootCause: z.string('rootCause deve ser uma string').min(3, 'rootCause deve ter no mínimo 3 caracteres').optional(),
 
-  assignedToId: z
-    .string('assignedToId deve ser uma string')
-    .uuid('assignedToId deve ser um UUID válido')
-    .optional(),
+  assignedToId: z.string('assignedToId deve ser uma string').uuid('assignedToId deve ser um UUID válido').optional(),
 });
 
 export type UpdateNonConformityDTO = z.infer<typeof updateNonConformitySchema>;

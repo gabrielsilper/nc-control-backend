@@ -1,7 +1,7 @@
-import { MoreThan } from 'typeorm';
 import RefreshToken from 'entities/refresh-token';
 import ITokenService from 'interfaces/token-service';
 import RefreshTokenRepository from 'repositories/refresh-token.repository';
+import { MoreThan } from 'typeorm';
 
 export default class RefreshTokenService {
   constructor(
