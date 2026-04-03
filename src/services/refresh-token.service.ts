@@ -55,4 +55,12 @@ export default class RefreshTokenService {
     const expiresInMs = 1000 * 60 * 60 * 24 * this.expiresDays;
     return new Date(Date.now() + expiresInMs);
   }
+
+  async findByToken(token: string) {
+    const hashedToken = this.tokenService.hashToken(token);
+
+    return this.refreshTokenRepository.findOne({
+      where: { token: hashedToken },
+    });
+  }
 }
