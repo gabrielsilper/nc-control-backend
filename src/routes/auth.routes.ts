@@ -1,5 +1,7 @@
 import { getEnvNumberOrThrow } from 'config/environment';
 import { Router } from 'express';
+import { validateBody } from 'middlewares/validate-body.middleware';
+import { loginSchema } from 'schemas/login.schema';
 import AuthController from '../controllers/auth.controller';
 import RefreshTokenRepository from '../repositories/refresh-token.repository';
 import UserRepository from '../repositories/user.repository';
@@ -22,6 +24,6 @@ const authController = new AuthController(authService);
 
 const authRoutes = Router();
 
-authRoutes.post('/login', (req, res) => authController.login(req, res));
+authRoutes.post('/login', validateBody(loginSchema), (req, res) => authController.login(req, res));
 
 export default authRoutes;
