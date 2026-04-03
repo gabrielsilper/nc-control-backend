@@ -1,10 +1,10 @@
-import NonConformityRepository from 'repositories/non-conformity.repository';
-import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
-import UserService from './user.service';
+import { StatusNc } from 'enums/status_nc.enum';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
+import NonConformityRepository from 'repositories/non-conformity.repository';
+import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
-import { StatusNc } from 'enums/status_nc.enum';
+import UserService from './user.service';
 
 export default class NonConformityService {
   constructor(

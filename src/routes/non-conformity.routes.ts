@@ -3,6 +3,7 @@ import { RequestWithPayload } from 'interfaces/token-service';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
+import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import { TokenService } from 'services/token.service';
 import NonConformityController from '../controllers/non-conformity.controller';
 import NonConformityRepository from '../repositories/non-conformity.repository';
@@ -29,18 +30,11 @@ nonConformityRoutes.post(
 );
 nonConformityRoutes.get('/', (req, res) => nonConformityController.findAll(req as RequestWithPayload, res));
 nonConformityRoutes.get('/:id', (req, res) => nonConformityController.findById(req, res));
-nonConformityRoutes.put('/', (req, res) => res.end(req.url));
-nonConformityRoutes.delete('/', (req, res) => res.end(req.url));
-
-// Essa vai ser para atualizar o responsável
-nonConformityRoutes.patch('/:id/assigne/:user', (req, res) => res.end(req.url));
-
-// Essa vai ser para atualizar a data de expiração
-nonConformityRoutes.patch('/:id/due-date/:date', (req, res) => res.end(req.url));
-
-// Essa vai ser para finalizar a não conformidade
-nonConformityRoutes.patch('/:id/fisish', (req, res) => res.end(req.url));
-
-// Falta imaginar para atualizar os status
+nonConformityRoutes.put('/:id', validateBody(updateNonConformitySchema), (req, res) =>
+  nonConformityController.update(req, res),
+);
+nonConformityRoutes.patch('/:id/assigne/:userId', (req, res) => nonConformityController.updateAssigne(req, res));
+nonConformityRoutes.patch('/:id/due-date/:date', (req, res) => nonConformityController.updateDueDate(req, res));
+nonConformityRoutes.patch('/:id/finish', (req, res) => nonConformityController.finish(req, res));
 
 export default nonConformityRoutes;
