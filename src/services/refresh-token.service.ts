@@ -88,6 +88,7 @@ export default class RefreshTokenService {
     await this.refreshTokenRepository.update(
       {
         userId,
+        revoked: false
       },
       {
         revoked: true,

@@ -1,6 +1,7 @@
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import UserService from './user.service';
+import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
 
 export default class NonConformityService {
   constructor(
@@ -11,11 +12,19 @@ export default class NonConformityService {
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
     const user = await this.userService.findById(userId);
 
+    const ncExists = await this.nonConformityRepository.existsBy({
+      number: nonConformityData.number,
+    });
+
+    if (ncExists) {
+      throw new NonConformityNumberAlreadyExistsError();
+    }
+
     const nonConformity = this.nonConformityRepository.create({
       ...nonConformityData,
       createdBy: user,
     });
 
-    this.nonConformityRepository.save(nonConformity);
+    return this.nonConformityRepository.save(nonConformity);
   }
 }
