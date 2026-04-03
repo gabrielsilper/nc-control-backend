@@ -1,5 +1,6 @@
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
+import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
 import RefreshTokenValidationError from 'errors/refresh-token-validation.error';
 import { UserNotFoundError } from 'errors/user-not-found.error';
 import type { NextFunction, Request, Response } from 'express';
@@ -21,7 +22,7 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  if (error instanceof EmailAlreadyExistsError) {
+  if (error instanceof EmailAlreadyExistsError || error instanceof NonConformityNumberAlreadyExistsError) {
     return res.status(409).json({
       error: error.name,
       message: error.message,

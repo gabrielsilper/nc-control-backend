@@ -9,7 +9,7 @@ export default class NonConformity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   number!: string;
 
   @Column({ type: 'varchar', nullable: false })
@@ -24,7 +24,7 @@ export default class NonConformity {
   @Column({ type: 'enum', nullable: false, enum: SeverityNc })
   severity!: SeverityNc;
 
-  @Column({ type: 'enum', nullable: false, enum: StatusNc })
+  @Column({ type: 'enum', nullable: false, enum: StatusNc, default: StatusNc.ABERTA })
   status!: StatusNc;
 
   @Column({ type: 'text', nullable: false, name: 'process_line' })

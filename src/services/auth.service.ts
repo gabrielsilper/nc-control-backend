@@ -8,10 +8,10 @@ import UserService from './user.service';
 
 export default class AuthService {
   constructor(
-    private userService: UserService,
-    private refreshTokenService: RefreshTokenService,
-    private tokenService: ITokenService,
-    private encrypter: IEncrypterService,
+    private readonly userService: UserService,
+    private readonly refreshTokenService: RefreshTokenService,
+    private readonly tokenService: ITokenService,
+    private readonly encrypter: IEncrypterService,
   ) {}
 
   async login(email: string, password: string, userAgent: string, ipAddress: string): Promise<ResponseTokensDTO> {

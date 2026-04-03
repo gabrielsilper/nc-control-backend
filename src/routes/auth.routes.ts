@@ -1,8 +1,8 @@
 import { getEnvNumberOrThrow } from 'config/environment';
 import { Router } from 'express';
 import { RequestWithPayload } from 'interfaces/token-service';
-import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { validateBody } from 'middlewares/validate-body.middleware';
+import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { loginSchema } from 'schemas/login.schema';
 import { refreshTokenSchema } from 'schemas/refresh-token.schema';
 import AuthController from '../controllers/auth.controller';
