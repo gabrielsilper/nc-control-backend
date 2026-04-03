@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import ITokenService, { AccessTokenPayload } from 'interfaces/token-service';
-
-type RequestWithPayload = Request & { payload: AccessTokenPayload };
+import ITokenService, { RequestWithPayload } from 'interfaces/token-service';
 
 export class ValidateTokenMiddleware {
   constructor(private readonly tokenService: ITokenService) {}

@@ -1,5 +1,6 @@
 import ResponseTokensDTO from 'dtos/response-tokens.dto';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
+import RefreshTokenValidationError from 'errors/refresh-token-validation.error';
 import IEncrypterService from 'interfaces/encrypter-service';
 import ITokenService from 'interfaces/token-service';
 import RefreshTokenService from './refresh-token.service';
@@ -20,7 +21,7 @@ export default class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    const passwordMatches = this.encrypter.compare(password, user.password);
+    const passwordMatches = await this.encrypter.compare(password, user.password);
 
     if (!passwordMatches) {
       throw new InvalidCredentialsError();
@@ -39,34 +40,61 @@ export default class AuthService {
   }
 
   async refresh(refreshToken: string, userAgent: string, ipAddress: string): Promise<ResponseTokensDTO> {
-    const storedToken = await this.refreshTokenService.findByToken(refreshToken); //busca no bd o token
+    const storedToken = await this.refreshTokenService.findByToken(refreshToken);
 
     if (!storedToken) {
-      throw new InvalidCredentialsError();
+      throw new RefreshTokenValidationError();
     }
 
     if (storedToken.userAgent !== userAgent) {
-      throw new InvalidCredentialsError();
+      throw new RefreshTokenValidationError();
     }
 
-    // Valida expiração
     if (storedToken.expirationDate < new Date()) {
-      throw new InvalidCredentialsError();
+      throw new RefreshTokenValidationError();
     }
 
-    // Novo access token
+    if (storedToken.revoked) {
+      throw new RefreshTokenValidationError();
+    }
+
     const accessToken = this.tokenService.generateAcessToken({
       sub: storedToken.userId,
       email: storedToken.user.email,
       profile: storedToken.user.profile,
     });
 
-    // invalida o antigo token e assume o novo
     const newRefreshToken = await this.refreshTokenService.refresh(storedToken, ipAddress);
 
     return {
       accessToken,
       refreshToken: newRefreshToken,
     };
+  }
+
+  async logout(refreshToken: string, userAgent: string) {
+    const storedToken = await this.refreshTokenService.findByToken(refreshToken);
+
+    if (!storedToken) {
+      throw new RefreshTokenValidationError();
+    }
+
+    if (storedToken.userAgent !== userAgent) {
+      throw new RefreshTokenValidationError();
+    }
+
+    if (storedToken.expirationDate < new Date()) {
+      throw new RefreshTokenValidationError();
+    }
+
+    if (storedToken.revoked) {
+      throw new RefreshTokenValidationError();
+    }
+
+    await this.refreshTokenService.revokeToken(storedToken);
+  }
+
+  async logoutAll(userId: string) {
+    await this.refreshTokenService.revokeAllTokens(userId);
   }
 }

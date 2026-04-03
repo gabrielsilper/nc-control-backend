@@ -1,3 +1,4 @@
+import { MoreThan } from 'typeorm';
 import RefreshToken from 'entities/refresh-token';
 import ITokenService from 'interfaces/token-service';
 import RefreshTokenRepository from 'repositories/refresh-token.repository';
@@ -28,6 +29,8 @@ export default class RefreshTokenService {
 
   async find(userId: string, userAgent: string) {
     return this.refreshTokenRepository.findOneBy({
+      expirationDate: MoreThan(new Date()),
+      revoked: false,
       userId,
       userAgent,
     });
@@ -42,6 +45,8 @@ export default class RefreshTokenService {
         id: currentRefreshToken.id,
       },
       {
+        revoked: false,
+        revokedAt: () => 'NULL',
         token: hashedToken,
         expirationDate: this.getNewExpiresDate(),
         ipAddress,
@@ -61,6 +66,33 @@ export default class RefreshTokenService {
 
     return this.refreshTokenRepository.findOne({
       where: { token: hashedToken },
+      relations: {
+        user: true,
+      },
     });
+  }
+
+  async revokeToken(refreshToken: RefreshToken) {
+    await this.refreshTokenRepository.update(
+      {
+        id: refreshToken.id,
+      },
+      {
+        revoked: true,
+        revokedAt: () => 'CURRENT_TIMESTAMP',
+      },
+    );
+  }
+
+  async revokeAllTokens(userId: string) {
+    await this.refreshTokenRepository.update(
+      {
+        userId,
+      },
+      {
+        revoked: true,
+        revokedAt: () => 'CURRENT_TIMESTAMP',
+      },
+    );
   }
 }

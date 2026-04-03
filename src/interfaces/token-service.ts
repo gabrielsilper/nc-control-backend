@@ -1,4 +1,5 @@
 import { Profile } from 'enums/profile.enum';
+import { Request } from 'express';
 
 export default interface ITokenService {
   generateAcessToken(payload: AccessTokenPayload): string;
@@ -12,3 +13,5 @@ export interface AccessTokenPayload {
   email: string;
   profile: Profile;
 }
+
+export type RequestWithPayload = Request & { payload: AccessTokenPayload };

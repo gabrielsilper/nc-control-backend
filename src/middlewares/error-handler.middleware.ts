@@ -1,12 +1,13 @@
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
+import RefreshTokenValidationError from 'errors/refresh-token-validation.error';
 import { UserNotFoundError } from 'errors/user-not-found.error';
 import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
 // TODO - Colocar uma criação de log desse erros com winston e criar um tabela para armazenar as informações
 export function errorHandler(error: Error, _req: Request, res: Response, _next: NextFunction) {
-  if (error instanceof InvalidCredentialsError) {
+  if (error instanceof InvalidCredentialsError || error instanceof RefreshTokenValidationError) {
     return res.status(401).json({
       error: error.name,
       message: error.message,
