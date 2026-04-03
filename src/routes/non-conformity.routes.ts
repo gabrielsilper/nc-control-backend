@@ -27,8 +27,8 @@ nonConformityRoutes.post(
   validateBody(createNonConformitySchema),
   (req, res) => nonConformityController.create(req as RequestWithPayload, res),
 );
-nonConformityRoutes.get('/', (req, res) => res.end(req.url));
-nonConformityRoutes.get('/:id', (req, res) => res.end(req.url));
+nonConformityRoutes.get('/', (req, res) => nonConformityController.findAll(req as RequestWithPayload, res));
+nonConformityRoutes.get('/:id', (req, res) => nonConformityController.findById(req, res));
 nonConformityRoutes.put('/', (req, res) => res.end(req.url));
 nonConformityRoutes.delete('/', (req, res) => res.end(req.url));
 
