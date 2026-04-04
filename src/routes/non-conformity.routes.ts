@@ -34,7 +34,7 @@ nonConformityRoutes.put('/:id', validateBody(updateNonConformitySchema), (req, r
   nonConformityController.update(req, res),
 );
 nonConformityRoutes.patch('/:id/status/:status', (req, res) => nonConformityController.updateStatus(req, res));
-nonConformityRoutes.patch('/:id/assigne/:userId', (req, res) => nonConformityController.updateAssigne(req, res));
+nonConformityRoutes.patch('/:id/assign/:userId', (req, res) => nonConformityController.assign(req, res));
 nonConformityRoutes.patch('/:id/due-date/:date', (req, res) => nonConformityController.updateDueDate(req, res));
 
 export default nonConformityRoutes;

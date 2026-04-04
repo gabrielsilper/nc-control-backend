@@ -14,12 +14,6 @@
 - Validar duplicidade de `number` também no `update`.
   Atualmente a verificação de número duplicado existe no `create`, mas não no `update`, o que pode resultar em erro de banco sem tratamento padronizado.
 
-- Validar existência do usuário em `assignedToId` antes de salvar.
-  Isso vale para criação, atualização e rota específica de atribuição.
-
-- Centralizar transições de status.
-  O `finish()` seta `ENCERRADA` e `closedAt`, mas o `update()` permite alterar `status` livremente sem garantir coerência entre status e data de fechamento.
-
 ## Importante
 
 - Melhorar o tratamento de erro global.

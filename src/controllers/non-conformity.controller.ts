@@ -38,10 +38,10 @@ export default class NonConformityController {
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
-  async updateAssigne(req: Request, res: Response) {
+  async assign(req: Request, res: Response) {
     const { id, userId } = req.params;
 
-    const nonConformity = await this.nonConformityService.updateAssigne(id as string, userId as string);
+    const nonConformity = await this.nonConformityService.assign(id as string, userId as string);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 

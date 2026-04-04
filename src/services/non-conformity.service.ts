@@ -82,10 +82,11 @@ export default class NonConformityService {
     return this.nonConformityRepository.save(nonConformity);
   }
 
-  async updateAssigne(id: string, userId: string) {
+  async assign(id: string, userId: string) {
     const nonConformity = await this.findById(id);
+    const user = await this.userService.findById(userId);
 
-    nonConformity.assignedToId = userId;
+    nonConformity.assignedTo = user;
 
     return this.nonConformityRepository.save(nonConformity);
   }
