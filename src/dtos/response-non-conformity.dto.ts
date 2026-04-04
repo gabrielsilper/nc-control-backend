@@ -17,5 +17,5 @@ export default interface ResponseNonConformityDTO {
   assignedToId?: string;
   openedAt: Date;
   dueDate?: Date;
-  closedAt?: Date;
+  closedAt?: Date | null;
 }

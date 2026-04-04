@@ -1,4 +1,5 @@
 import { StatusNc } from 'enums/status_nc.enum';
+import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
@@ -47,16 +48,36 @@ export default class NonConformityService {
 
   async update(id: string, nonConformityData: UpdateNonConformityDTO) {
     const nonConformity = await this.findById(id);
+    const { status, ...restOfData } = nonConformityData;
 
-    const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, nonConformityData);
+    const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
+    const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
 
-    return this.nonConformityRepository.save(UpdatedNonConformity);
+    if (!status) {
+      return savedNonConformity;
+    }
+
+    return this.updateStatus(id, status);
   }
 
-  async updateStatus(id: string, status: StatusNc) {
+  async updateStatus(id: string, nextStatus: StatusNc) {
     const nonConformity = await this.findById(id);
+    const currentStatus = nonConformity.status;
 
-    nonConformity.status = status;
+    if (currentStatus === nextStatus) {
+      return nonConformity;
+    }
+
+    if (currentStatus === StatusNc.CANCELADA) {
+      throw new InvalidNonConformityStatusTransitionError(currentStatus, nextStatus);
+    }
+
+    if (currentStatus === StatusNc.ENCERRADA && nextStatus !== StatusNc.ABERTA) {
+      throw new InvalidNonConformityStatusTransitionError(currentStatus, nextStatus);
+    }
+
+    nonConformity.closedAt = nextStatus === StatusNc.ENCERRADA ? new Date() : null;
+    nonConformity.status = nextStatus;
 
     return this.nonConformityRepository.save(nonConformity);
   }
@@ -75,11 +96,5 @@ export default class NonConformityService {
     nonConformity.dueDate = dueDate;
 
     return this.nonConformityRepository.save(nonConformity);
-  }
-
-  async finish(id: string) {
-    await this.findById(id);
-
-    await this.nonConformityRepository.update({ id }, { status: StatusNc.ENCERRADA, closedAt: () => 'CURRENT_TIMESTAMP' });
   }
 }

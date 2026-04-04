@@ -68,5 +68,5 @@ export default class NonConformity {
   dueDate?: Date;
 
   @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
-  closedAt?: Date;
+  closedAt?: Date | null;
 }

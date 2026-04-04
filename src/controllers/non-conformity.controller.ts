@@ -53,10 +53,10 @@ export default class NonConformityController {
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
-  async finish(req: Request, res: Response) {
-    const { id } = req.params;
+  async updateStatus(req: Request, res: Response) {
+    const { id, status } = req.params;
 
-    await this.nonConformityService.finish(id as string);
-    return res.status(204).end();
+    const nonConformity = await this.nonConformityService.updateStatus(id as string, Number(status));
+    return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 }
