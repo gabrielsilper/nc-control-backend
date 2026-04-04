@@ -31,13 +31,7 @@ export default class UserService {
   }
 
   async create(userData: CreateUserDTO): Promise<User> {
-    const userExists = await this.userRepository.existsBy({
-      email: userData.email,
-    });
-
-    if (userExists) {
-      throw new EmailAlreadyExistsError();
-    }
+    this.validateEmailExists(userData.email);
 
     const password = await this.encrypter.encrypt(userData.password);
 
@@ -48,6 +42,10 @@ export default class UserService {
 
   async update(id: string, userData: UpdateUserDTO): Promise<User> {
     const user = await this.findById(id);
+
+    if (userData.email && userData.email !== user.email) {
+      this.validateEmailExists(userData.email);
+    }
 
     if (userData.password) {
       userData.password = await this.encrypter.encrypt(userData.password);
@@ -61,5 +59,15 @@ export default class UserService {
   async delete(id: string): Promise<void> {
     const user = await this.findById(id);
     await this.userRepository.remove(user);
+  }
+
+  private async validateEmailExists(email: string) {
+    const userExists = await this.userRepository.existsBy({
+      email,
+    });
+
+    if (userExists) {
+      throw new EmailAlreadyExistsError();
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { StatusNc } from 'enums/status_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
-import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
+import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
@@ -15,6 +15,8 @@ export default class NonConformityService {
 
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
     const user = await this.userService.findById(userId);
+
+    this.validateNumberExists(nonConformityData.number);
 
     const ncExists = await this.nonConformityRepository.existsBy({
       number: nonConformityData.number,
@@ -49,6 +51,10 @@ export default class NonConformityService {
   async update(id: string, nonConformityData: UpdateNonConformityDTO) {
     const nonConformity = await this.findById(id);
     const { status, ...restOfData } = nonConformityData;
+
+    if (nonConformityData.number && nonConformityData.number !== nonConformity.number) {
+      this.validateNumberExists(nonConformityData.number);
+    }
 
     const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
     const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
@@ -97,5 +103,15 @@ export default class NonConformityService {
     nonConformity.dueDate = dueDate;
 
     return this.nonConformityRepository.save(nonConformity);
+  }
+
+  private async validateNumberExists(number: string) {
+    const ncExists = await this.nonConformityRepository.existsBy({
+      number,
+    });
+
+    if (ncExists) {
+      throw new NonConformityNumberAlreadyExistsError();
+    }
   }
 }

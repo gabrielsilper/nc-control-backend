@@ -1,7 +1,7 @@
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
-import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error copy';
+import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import RefreshTokenValidationError from 'errors/refresh-token-validation.error';
 import { UserNotFoundError } from 'errors/user-not-found.error';
