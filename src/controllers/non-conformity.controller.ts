@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { RequestWithPayload } from 'interfaces/token-service';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
+import { FindByIdParams } from 'schemas/find-by-id-params.schema';
+import { AssignParams, UpdateDueDateParams, UpdateStatusParams } from 'schemas/non-conformity-params.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import NonConformityService from 'services/non-conformity.service';
 
@@ -24,39 +26,39 @@ export default class NonConformityController {
   }
 
   async findById(req: Request, res: Response) {
-    const { id } = req.params;
+    const { id } = req.params as FindByIdParams;
 
-    const nonConformity = await this.nonConformityService.findById(id as string);
+    const nonConformity = await this.nonConformityService.findById(id);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async update(req: Request, res: Response) {
-    const { id } = req.params;
+    const { id } = req.params as FindByIdParams;
     const updateData = req.body as UpdateNonConformityDTO;
 
-    const nonConformity = await this.nonConformityService.update(id as string, updateData);
+    const nonConformity = await this.nonConformityService.update(id, updateData);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async assign(req: Request, res: Response) {
-    const { id, userId } = req.params;
+    const { id, userId } = req.params as AssignParams;
 
-    const nonConformity = await this.nonConformityService.assign(id as string, userId as string);
+    const nonConformity = await this.nonConformityService.assign(id, userId);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async updateDueDate(req: Request, res: Response) {
-    const { id, date } = req.params;
-    const dueDate = new Date(date as string);
+    const { id, date } = req.params as UpdateDueDateParams;
+    const dueDate = new Date(date);
 
-    const nonConformity = await this.nonConformityService.updateDueDate(id as string, dueDate);
+    const nonConformity = await this.nonConformityService.updateDueDate(id, dueDate);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async updateStatus(req: Request, res: Response) {
-    const { id, status } = req.params;
+    const { id, status } = req.params as unknown as UpdateStatusParams;
 
-    const nonConformity = await this.nonConformityService.updateStatus(id as string, Number(status));
+    const nonConformity = await this.nonConformityService.updateStatus(id, status);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 }
