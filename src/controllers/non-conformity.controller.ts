@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { RequestWithPayload } from 'interfaces/token-service';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindByIdParams } from 'schemas/find-by-id-params.schema';
@@ -10,7 +9,7 @@ import NonConformityService from 'services/non-conformity.service';
 export default class NonConformityController {
   constructor(private readonly nonConformityService: NonConformityService) {}
 
-  async create(req: RequestWithPayload, res: Response) {
+  async create(req: Request, res: Response) {
     const { sub } = req.payload;
 
     const nonConformityData = req.body as CreateNonConformityDTO;
@@ -19,7 +18,7 @@ export default class NonConformityController {
     return res.status(201).json(nonConformityToResponseDto(newNonConformity));
   }
 
-  async findAll(_req: RequestWithPayload, res: Response) {
+  async findAll(_req: Request, res: Response) {
     const nonConformities = await this.nonConformityService.findAll();
     const nonConformitiesDto = nonConformities.map((nonConformity) => nonConformityToResponseDto(nonConformity));
     return res.status(200).json(nonConformitiesDto);

@@ -1,6 +1,5 @@
 import { getEnvNumberOrThrow } from 'config/environment';
 import { Router } from 'express';
-import { RequestWithPayload } from 'interfaces/token-service';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { loginSchema } from 'schemas/login.schema';
@@ -33,8 +32,8 @@ authRoutes.post('/refresh', validateBody(refreshTokenSchema), (req, res) => auth
 authRoutes.post('/logout', validateBody(refreshTokenSchema), (req, res) => authController.logout(req, res));
 authRoutes.post(
   '/logout/all',
-  (req, res, next) => validateTokenMiddleware.handle(req as RequestWithPayload, res, next),
-  (req, res) => authController.logoutAll(req as RequestWithPayload, res),
+  (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  (req, res) => authController.logoutAll(req, res),
 );
 
 export default authRoutes;
