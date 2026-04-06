@@ -26,14 +26,14 @@ export default class NonConformityController {
   }
 
   async findById(req: Request, res: Response) {
-    const { id } = req.params as FindByIdParams;
+    const { id } = req.validatedParams as FindByIdParams;
 
     const nonConformity = await this.nonConformityService.findById(id);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async update(req: Request, res: Response) {
-    const { id } = req.params as FindByIdParams;
+    const { id } = req.validatedParams as FindByIdParams;
     const updateData = req.body as UpdateNonConformityDTO;
 
     const nonConformity = await this.nonConformityService.update(id, updateData);
@@ -41,14 +41,14 @@ export default class NonConformityController {
   }
 
   async assign(req: Request, res: Response) {
-    const { id, userId } = req.params as AssignParams;
+    const { id, userId } = req.validatedParams as AssignParams;
 
     const nonConformity = await this.nonConformityService.assign(id, userId);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async updateDueDate(req: Request, res: Response) {
-    const { id, date } = req.params as UpdateDueDateParams;
+    const { id, date } = req.validatedParams as UpdateDueDateParams;
     const dueDate = new Date(date);
 
     const nonConformity = await this.nonConformityService.updateDueDate(id, dueDate);
@@ -56,7 +56,7 @@ export default class NonConformityController {
   }
 
   async updateStatus(req: Request, res: Response) {
-    const { id, status } = req.params as unknown as UpdateStatusParams;
+    const { id, status } = req.validatedParams as UpdateStatusParams;
 
     const nonConformity = await this.nonConformityService.updateStatus(id, status);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));

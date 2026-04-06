@@ -3,10 +3,15 @@ import { z } from 'zod';
 
 export const updateStatusParamsSchema = z.object({
   id: z.string().uuid('ID da não conformidade inválido'),
-  status: z.enum(StatusNc, {
-    message:
-      'status deve ser um valor de enum válido: 0 - ABERTA, 1 - EM_TRABALHO, 2 - AGUARDANDO, 3 - VERIFICACAO, 4 - ENCERRADA, 5 - CANCELADA',
-  }),
+  status: z
+    .string()
+    .transform(Number)
+    .pipe(
+      z.enum(StatusNc, {
+        message:
+          'status deve ser um valor de enum válido: 0 - ABERTA, 1 - EM_TRABALHO, 2 - AGUARDANDO, 3 - VERIFICACAO, 4 - ENCERRADA, 5 - CANCELADA',
+      }),
+    ),
 });
 export type UpdateStatusParams = z.infer<typeof updateStatusParamsSchema>;
 
