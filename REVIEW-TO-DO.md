@@ -1,9 +1,7 @@
-# REVIEW-TO-DO.md para o módulo de Não Conformidades
-
 ## Crítico
 
-- Proteger todas as rotas de não conformidade com validação de token JWT.
-  Hoje apenas o `POST /non-conformities` exige token; `GET`, `PUT` e `PATCH` continuam expostos.
+- Definir política explícita de autorização por perfil.
+  O token já carrega `profile`, então vale decidir quais perfis podem criar, editar, atribuir e encerrar NCs.
 
 ## Importante
 
@@ -12,9 +10,6 @@
 
 - Reduzir a composição manual de dependências dentro da rota.
   Extrair a criação de controller/service/repository para uma factory ou composição própria do módulo.
-
-- Definir política explícita de autorização por perfil.
-  O token já carrega `profile`, então vale decidir quais perfis podem criar, editar, atribuir e encerrar NCs.
 
 ## Melhoria
 
