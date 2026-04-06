@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { RequestWithPayload } from 'interfaces/token-service';
 import { LoginDTO } from 'schemas/login.schema';
 import { RefreshTokenDTO } from 'schemas/refresh-token.schema';
 import AuthService from 'services/auth.service';
@@ -36,7 +35,7 @@ export default class AuthController {
     res.status(204).end();
   }
 
-  async logoutAll(req: RequestWithPayload, res: Response) {
+  async logoutAll(req: Request, res: Response) {
     await this.authService.logoutAll(req.payload.sub);
 
     res.status(204).end();
