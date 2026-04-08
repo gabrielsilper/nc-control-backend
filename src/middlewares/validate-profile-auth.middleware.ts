@@ -11,11 +11,11 @@ export function validateProfileAuth(profileWithAcess: Profile, restrict: boolean
     };
 
     if (!restrict && profile < profileWithAcess) {
-      return res.status(401).json(authorizationErrorResponse);
+      return res.status(403).json(authorizationErrorResponse);
     }
 
     if (restrict && profile !== profileWithAcess) {
-      return res.status(401).json(authorizationErrorResponse);
+      return res.status(403).json(authorizationErrorResponse);
     }
 
     next();
