@@ -1,11 +1,15 @@
 import 'reflect-metadata';
 import { appDataSource } from 'database/app-data-source';
 import express from 'express';
+import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from 'middlewares/error-handler.middleware';
 import morgan from 'morgan';
 import indexRoutes from 'routes/index.routes';
 import type { DataSource } from 'typeorm';
+import { getEnvOrThrow } from 'config/environment';
+
+const FRONTEND_URL = getEnvOrThrow('FRONTEND_URL');
 
 export default class App {
   public readonly server: express.Express;
@@ -20,6 +24,12 @@ export default class App {
   }
 
   private config(): void {
+    this.server.use(cors({
+      origin: FRONTEND_URL,
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+      optionsSuccessStatus: 200
+    }))
     this.server.use(express.json());
     this.server.use(morgan('common'));
     this.server.use(
