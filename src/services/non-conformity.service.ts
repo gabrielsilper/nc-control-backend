@@ -4,6 +4,7 @@ import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
+import { FindNonConformitiesQuery } from 'schemas/find-non-conformities.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import UserService from './user.service';
 
@@ -34,8 +35,57 @@ export default class NonConformityService {
     return this.nonConformityRepository.save(nonConformity);
   }
 
-  findAll() {
-    return this.nonConformityRepository.find();
+  async findAll(filters: FindNonConformitiesQuery) {
+    const { page, pageSize, order, type, severity, status, assignedToId, expired, search } = filters;
+    const queryBuilder = this.nonConformityRepository.createQueryBuilder('nonConformity');
+
+    if (type !== undefined) {
+      queryBuilder.andWhere('nonConformity.type = :type', { type });
+    }
+
+    if (severity !== undefined) {
+      queryBuilder.andWhere('nonConformity.severity = :severity', { severity });
+    }
+
+    if (status !== undefined) {
+      queryBuilder.andWhere('nonConformity.status = :status', { status });
+    }
+
+    if (assignedToId) {
+      queryBuilder.andWhere('nonConformity.assignedToId = :assignedToId', { assignedToId });
+    }
+
+    if (expired !== undefined) {
+      if (expired) {
+        queryBuilder.andWhere('nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW()');
+      } else {
+        queryBuilder.andWhere('(nonConformity.dueDate IS NULL OR nonConformity.dueDate >= NOW())');
+      }
+    }
+
+    if (search) {
+      queryBuilder.andWhere('(nonConformity.number ILIKE :search OR nonConformity.title ILIKE :search)', {
+        search: `%${search}%`,
+      });
+    }
+
+    queryBuilder.orderBy('nonConformity.openedAt', order);
+
+    const [items, total] = await queryBuilder
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+    const totalPages = Math.ceil(total / pageSize);
+    const hasNext = page < totalPages;
+
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages,
+      hasNext,
+    };
   }
 
   async findById(id: string) {

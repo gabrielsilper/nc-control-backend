@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { validateParams } from 'middlewares/validate-params.middleware';
+import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
 import { findByIdParamsSchema } from 'schemas/find-by-id-params.schema';
+import { findNonConformitiesQuerySchema } from 'schemas/find-non-conformities.schema';
 import { assignParamsSchema, updateDueDateParamsSchema, updateStatusParamsSchema } from 'schemas/non-conformity-params.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import { TokenService } from 'services/token.service';
@@ -34,6 +36,7 @@ nonConformityRoutes.post(
 nonConformityRoutes.get(
   '/',
   (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  validateQuery(findNonConformitiesQuerySchema),
   (req, res) => nonConformityController.findAll(req, res),
 );
 

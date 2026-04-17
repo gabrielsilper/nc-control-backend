@@ -1,7 +1,9 @@
+import ResponseNonConformitiesPageDTO from 'dtos/response-non-conformities-page.dto';
 import { Request, Response } from 'express';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindByIdParams } from 'schemas/find-by-id-params.schema';
+import { FindNonConformitiesQuery } from 'schemas/find-non-conformities.schema';
 import { AssignParams, UpdateDueDateParams, UpdateStatusParams } from 'schemas/non-conformity-params.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import NonConformityService from 'services/non-conformity.service';
@@ -18,10 +20,16 @@ export default class NonConformityController {
     return res.status(201).json(nonConformityToResponseDto(newNonConformity));
   }
 
-  async findAll(_req: Request, res: Response) {
-    const nonConformities = await this.nonConformityService.findAll();
-    const nonConformitiesDto = nonConformities.map((nonConformity) => nonConformityToResponseDto(nonConformity));
-    return res.status(200).json(nonConformitiesDto);
+  async findAll(req: Request, res: Response) {
+    const query = req.validatedQuery as FindNonConformitiesQuery;
+    const pageResult = await this.nonConformityService.findAll(query);
+
+    const response: ResponseNonConformitiesPageDTO = {
+      ...pageResult,
+      items: pageResult.items.map((nonConformity) => nonConformityToResponseDto(nonConformity)),
+    };
+
+    return res.status(200).json(response);
   }
 
   async findById(req: Request, res: Response) {
