@@ -34,7 +34,14 @@ export const findNonConformitiesQuerySchema = z.object({
       message: `Status deve ser um dos valores: ${statusValues.join(', ')}`,
     }),
   assignedToId: z.string().uuid('assignedToId deve ser um UUID válido').optional(),
-  expired: z.coerce.boolean().optional(),
+  expired: z.coerce
+    .number()
+    .int()
+    .refine((value) => value === 0 || value === 1, {
+      message: 'expired deve ser 0 ou 1',
+    })
+    .transform((value) => value === 1)
+    .optional(),
   search: z.string().trim().optional(),
 });
 

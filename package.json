@@ -22,6 +22,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch src --ext ts --exec tsx --env-file=.env src/server.ts",
+    "seed:non-conformities": "tsx --env-file=.env src/scripts/seed-non-conformities.ts",
     "biome:check": "npx @biomejs/biome check --write"
   },
   "dependencies": {
