@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { appDataSource } from 'database/app-data-source';
+import NonConformity from 'entities/non-conformity';
+import User from 'entities/user';
 import { Profile } from 'enums/profile.enum';
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
-import NonConformity from 'entities/non-conformity';
-import User from 'entities/user';
 import Bcrypt from 'utils/bcrypt';
 
 type NonConformitySeed = {
@@ -66,7 +66,8 @@ async function ensureUsers(): Promise<User[]> {
       userRepository.create({
         ...user,
         password: await bcrypt.encrypt(user.password),
-      })),
+      }),
+    ),
   );
 
   return userRepository.save(usersToInsert);
@@ -88,7 +89,8 @@ function buildSeedData(users: User[]): NonConformitySeed[] {
     {
       number: 'NC-2026-000001',
       title: 'Etiqueta de validade ilegivel em lote de reagentes',
-      description: 'Durante a inspecao de recebimento, duas caixas chegaram com etiqueta borrada, impedindo a rastreabilidade do lote.',
+      description:
+        'Durante a inspecao de recebimento, duas caixas chegaram com etiqueta borrada, impedindo a rastreabilidade do lote.',
       type: TypeNc.MATERIAL,
       severity: SeverityNc.MEDIA,
       status: StatusNc.ABERTA,
@@ -405,7 +407,9 @@ async function run() {
     await nonConformityRepository.save(entities);
 
     const assignedCount = itemsToInsert.filter((item) => item.assignedToId).length;
-    const expiredCount = itemsToInsert.filter((item) => item.dueDate && item.dueDate < new Date() && item.status !== StatusNc.ENCERRADA).length;
+    const expiredCount = itemsToInsert.filter(
+      (item) => item.dueDate && item.dueDate < new Date() && item.status !== StatusNc.ENCERRADA,
+    ).length;
 
     console.log(`${itemsToInsert.length} nao conformidades inseridas com sucesso.`);
     console.log(`${users.length} usuarios disponiveis para relacionamento.`);
