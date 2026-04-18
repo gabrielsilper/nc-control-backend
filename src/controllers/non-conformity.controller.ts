@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindByIdParams } from 'schemas/find-by-id-params.schema';
-import { FindNonConformitiesQuery } from 'schemas/find-non-conformities.schema';
+import { FindNonConformitiesQuery, RankingLimitQuery } from 'schemas/non-conformities-queries.schema';
 import { AssignParams, UpdateDueDateParams, UpdateStatusParams } from 'schemas/non-conformity-params.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import NonConformityService from 'services/non-conformity.service';
@@ -71,6 +71,12 @@ export default class NonConformityController {
 
   async getDashboardCounts(_req: Request, res: Response) {
     const dashboardCounts = await this.nonConformityService.getDashboardCounts();
+    return res.status(200).json(dashboardCounts);
+  }
+
+  async getDashboardTypeRanking(req: Request, res: Response) {
+    const { limit } = req.validatedQuery as RankingLimitQuery;
+    const dashboardCounts = await this.nonConformityService.getDashboardTypeRanking(limit);
     return res.status(200).json(dashboardCounts);
   }
 }

@@ -46,3 +46,9 @@ export const findNonConformitiesQuerySchema = z.object({
 });
 
 export type FindNonConformitiesQuery = z.infer<typeof findNonConformitiesQuerySchema>;
+
+export const rankingLimitQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1, 'Limit deve ser maior ou igual a 1').default(3),
+});
+
+export type RankingLimitQuery = z.infer<typeof rankingLimitQuerySchema>;

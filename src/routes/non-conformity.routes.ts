@@ -5,7 +5,7 @@ import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
 import { findByIdParamsSchema } from 'schemas/find-by-id-params.schema';
-import { findNonConformitiesQuerySchema } from 'schemas/find-non-conformities.schema';
+import { findNonConformitiesQuerySchema, rankingLimitQuerySchema } from 'schemas/non-conformities-queries.schema';
 import { assignParamsSchema, updateDueDateParamsSchema, updateStatusParamsSchema } from 'schemas/non-conformity-params.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import { TokenService } from 'services/token.service';
@@ -33,7 +33,10 @@ nonConformityRoutes.get('/', validateQuery(findNonConformitiesQuerySchema), (req
   nonConformityController.findAll(req, res),
 );
 
-nonConformityRoutes.get('/dashboard-counts', (req, res) => nonConformityController.getDashboardCounts(req, res));
+nonConformityRoutes.get('/counts', (req, res) => nonConformityController.getDashboardCounts(req, res));
+nonConformityRoutes.get('/ranking', validateQuery(rankingLimitQuerySchema), (req, res) =>
+  nonConformityController.getDashboardTypeRanking(req, res),
+);
 
 nonConformityRoutes.get('/:id', validateParams(findByIdParamsSchema), (req, res) => nonConformityController.findById(req, res));
 

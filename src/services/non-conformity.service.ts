@@ -5,9 +5,10 @@ import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
-import { FindNonConformitiesQuery } from 'schemas/find-non-conformities.schema';
+import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import UserService from './user.service';
+import { TypeNc } from 'enums/type_nc.enum';
 
 export default class NonConformityService {
   constructor(
@@ -163,11 +164,14 @@ export default class NonConformityService {
       .createQueryBuilder('nc')
       .select('COUNT(CASE WHEN nc.status = :openStatus THEN 1 END)', 'openNonConformities')
       .addSelect('COUNT(CASE WHEN nc.severity IN (:...severities) THEN 1 END)', 'warningNonConformities')
-      .addSelect('COUNT(CASE WHEN nc.dueDate < CURRENT_DATE AND nc.status NOT IN (:...closedStatus) THEN 1 END)', 'expiredNonConformities')
+      .addSelect(
+        'COUNT(CASE WHEN nc.dueDate < CURRENT_DATE AND nc.status NOT IN (:...closedStatus) THEN 1 END)',
+        'expiredNonConformities',
+      )
       .addSelect('COUNT(CASE WHEN EXTRACT(MONTH FROM nc.closedAt) = :month THEN 1 END)', 'closedNonConformities')
       .setParameters({
         openStatus: StatusNc.ABERTA,
-        closedStatus: [StatusNc.ENCERRADA,StatusNc.CANCELADA],
+        closedStatus: [StatusNc.ENCERRADA, StatusNc.CANCELADA],
         severities: [SeverityNc.ALTA, SeverityNc.CRITICA],
         month: this.getCurrentMonth(),
       })
@@ -179,6 +183,23 @@ export default class NonConformityService {
       expiredNonConformities: Number(raw.expiredNonConformities),
       closedNonConformities: Number(raw.closedNonConformities),
     };
+  }
+
+  async getDashboardTypeRanking(limit: number) {
+    const raw = await this.nonConformityRepository
+      .createQueryBuilder('nc')
+      .select('nc.type', 'type')
+      .addSelect('COUNT(*)', 'total')
+      .groupBy('nc.type')
+      .orderBy('total', 'DESC')
+      .limit(limit)
+      .getRawMany();
+
+    return raw.map((row) => ({
+      type: row.type,
+      name: TypeNc[row.type],
+      total: Number(row.total),
+    }));
   }
 
   private async validateNumberExists(number: string) {
