@@ -1,3 +1,4 @@
+import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
@@ -52,7 +53,9 @@ export default class NonConformityService {
     }
 
     if (assignedToId) {
-      queryBuilder.andWhere('nonConformity.assignedToId = :assignedToId', { assignedToId });
+      queryBuilder.andWhere('nonConformity.assignedToId = :assignedToId', {
+        assignedToId,
+      });
     }
 
     if (expired !== undefined) {
@@ -155,6 +158,29 @@ export default class NonConformityService {
     return this.nonConformityRepository.save(nonConformity);
   }
 
+  async getDashboardCounts() {
+    const raw = await this.nonConformityRepository
+      .createQueryBuilder('nc')
+      .select('COUNT(CASE WHEN nc.status = :openStatus THEN 1 END)', 'openNonConformities')
+      .addSelect('COUNT(CASE WHEN nc.severity IN (:...severities) THEN 1 END)', 'warningNonConformities')
+      .addSelect('COUNT(CASE WHEN nc.dueDate < CURRENT_DATE AND nc.status NOT IN (:...closedStatus) THEN 1 END)', 'expiredNonConformities')
+      .addSelect('COUNT(CASE WHEN EXTRACT(MONTH FROM nc.closedAt) = :month THEN 1 END)', 'closedNonConformities')
+      .setParameters({
+        openStatus: StatusNc.ABERTA,
+        closedStatus: [StatusNc.ENCERRADA,StatusNc.CANCELADA],
+        severities: [SeverityNc.ALTA, SeverityNc.CRITICA],
+        month: this.getCurrentMonth(),
+      })
+      .getRawOne();
+
+    return {
+      openNonConformities: Number(raw.openNonConformities),
+      warningNonConformities: Number(raw.warningNonConformities),
+      expiredNonConformities: Number(raw.expiredNonConformities),
+      closedNonConformities: Number(raw.closedNonConformities),
+    };
+  }
+
   private async validateNumberExists(number: string) {
     const ncExists = await this.nonConformityRepository.existsBy({
       number,
@@ -163,5 +189,9 @@ export default class NonConformityService {
     if (ncExists) {
       throw new NonConformityNumberAlreadyExistsError();
     }
+  }
+
+  private getCurrentMonth() {
+    return new Date().getMonth() + 1;
   }
 }

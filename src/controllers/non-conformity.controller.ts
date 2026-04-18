@@ -68,4 +68,9 @@ export default class NonConformityController {
     const nonConformity = await this.nonConformityService.updateStatus(id, status);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
+
+  async getDashboardCounts(_req: Request, res: Response) {
+    const dashboardCounts = await this.nonConformityService.getDashboardCounts();
+    return res.status(200).json(dashboardCounts);
+  }
 }

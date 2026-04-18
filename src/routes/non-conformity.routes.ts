@@ -33,6 +33,8 @@ nonConformityRoutes.get('/', validateQuery(findNonConformitiesQuerySchema), (req
   nonConformityController.findAll(req, res),
 );
 
+nonConformityRoutes.get('/dashboard-counts', (req, res) => nonConformityController.getDashboardCounts(req, res));
+
 nonConformityRoutes.get('/:id', validateParams(findByIdParamsSchema), (req, res) => nonConformityController.findById(req, res));
 
 nonConformityRoutes.put('/:id', validateParams(findByIdParamsSchema), validateBody(updateNonConformitySchema), (req, res) =>
