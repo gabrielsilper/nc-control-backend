@@ -1,11 +1,14 @@
+import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
+import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import UserService from './user.service';
+import { TypeNc } from 'enums/type_nc.enum';
 
 export default class NonConformityService {
   constructor(
@@ -34,8 +37,59 @@ export default class NonConformityService {
     return this.nonConformityRepository.save(nonConformity);
   }
 
-  findAll() {
-    return this.nonConformityRepository.find();
+  async findAll(filters: FindNonConformitiesQuery) {
+    const { page, pageSize, order, type, severity, status, assignedToId, expired, search } = filters;
+    const queryBuilder = this.nonConformityRepository.createQueryBuilder('nonConformity');
+
+    if (type !== undefined) {
+      queryBuilder.andWhere('nonConformity.type = :type', { type });
+    }
+
+    if (severity !== undefined) {
+      queryBuilder.andWhere('nonConformity.severity = :severity', { severity });
+    }
+
+    if (status !== undefined) {
+      queryBuilder.andWhere('nonConformity.status = :status', { status });
+    }
+
+    if (assignedToId) {
+      queryBuilder.andWhere('nonConformity.assignedToId = :assignedToId', {
+        assignedToId,
+      });
+    }
+
+    if (expired !== undefined) {
+      if (expired) {
+        queryBuilder.andWhere('nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW()');
+      } else {
+        queryBuilder.andWhere('(nonConformity.dueDate IS NULL OR nonConformity.dueDate >= NOW())');
+      }
+    }
+
+    if (search) {
+      queryBuilder.andWhere('(nonConformity.number ILIKE :search OR nonConformity.title ILIKE :search)', {
+        search: `%${search}%`,
+      });
+    }
+
+    queryBuilder.orderBy('nonConformity.openedAt', order);
+
+    const [items, total] = await queryBuilder
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+    const totalPages = Math.ceil(total / pageSize);
+    const hasNext = page < totalPages;
+
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages,
+      hasNext,
+    };
   }
 
   async findById(id: string) {
@@ -105,6 +159,49 @@ export default class NonConformityService {
     return this.nonConformityRepository.save(nonConformity);
   }
 
+  async getDashboardCounts() {
+    const raw = await this.nonConformityRepository
+      .createQueryBuilder('nc')
+      .select('COUNT(CASE WHEN nc.status = :openStatus THEN 1 END)', 'openNonConformities')
+      .addSelect('COUNT(CASE WHEN nc.severity IN (:...severities) THEN 1 END)', 'warningNonConformities')
+      .addSelect(
+        'COUNT(CASE WHEN nc.dueDate < CURRENT_DATE AND nc.status NOT IN (:...closedStatus) THEN 1 END)',
+        'expiredNonConformities',
+      )
+      .addSelect('COUNT(CASE WHEN EXTRACT(MONTH FROM nc.closedAt) = :month THEN 1 END)', 'closedNonConformities')
+      .setParameters({
+        openStatus: StatusNc.ABERTA,
+        closedStatus: [StatusNc.ENCERRADA, StatusNc.CANCELADA],
+        severities: [SeverityNc.ALTA, SeverityNc.CRITICA],
+        month: this.getCurrentMonth(),
+      })
+      .getRawOne();
+
+    return {
+      openNonConformities: Number(raw.openNonConformities),
+      warningNonConformities: Number(raw.warningNonConformities),
+      expiredNonConformities: Number(raw.expiredNonConformities),
+      closedNonConformities: Number(raw.closedNonConformities),
+    };
+  }
+
+  async getDashboardTypeRanking(limit: number) {
+    const raw = await this.nonConformityRepository
+      .createQueryBuilder('nc')
+      .select('nc.type', 'type')
+      .addSelect('COUNT(*)', 'total')
+      .groupBy('nc.type')
+      .orderBy('total', 'DESC')
+      .limit(limit)
+      .getRawMany();
+
+    return raw.map((row) => ({
+      type: row.type,
+      name: TypeNc[row.type],
+      total: Number(row.total),
+    }));
+  }
+
   private async validateNumberExists(number: string) {
     const ncExists = await this.nonConformityRepository.existsBy({
       number,
@@ -113,5 +210,9 @@ export default class NonConformityService {
     if (ncExists) {
       throw new NonConformityNumberAlreadyExistsError();
     }
+  }
+
+  private getCurrentMonth() {
+    return new Date().getMonth() + 1;
   }
 }

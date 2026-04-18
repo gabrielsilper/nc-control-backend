@@ -5,6 +5,7 @@ declare global {
     interface Request {
       payload: AccessTokenPayload;
       validatedParams?: Record<string, unknown>;
+      validatedQuery?: Record<string, unknown>;
     }
   }
 }
