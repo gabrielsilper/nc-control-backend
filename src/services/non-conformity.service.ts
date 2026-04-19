@@ -19,15 +19,7 @@ export default class NonConformityService {
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
     const user = await this.userService.findById(userId);
 
-    this.validateNumberExists(nonConformityData.number);
-
-    const ncExists = await this.nonConformityRepository.existsBy({
-      number: nonConformityData.number,
-    });
-
-    if (ncExists) {
-      throw new NonConformityNumberAlreadyExistsError();
-    }
+    await this.validateNumberExists(nonConformityData.number);
 
     const nonConformity = this.nonConformityRepository.create({
       ...nonConformityData,
@@ -107,13 +99,13 @@ export default class NonConformityService {
     const { status, ...restOfData } = nonConformityData;
 
     if (nonConformityData.number && nonConformityData.number !== nonConformity.number) {
-      this.validateNumberExists(nonConformityData.number);
+      await this.validateNumberExists(nonConformityData.number);
     }
 
     const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
     const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
 
-    if (!status) {
+    if (status === undefined) {
       return savedNonConformity;
     }
 
