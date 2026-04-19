@@ -28,7 +28,7 @@ export const updateNonConformitySchema = z.object({
   status: z
     .enum(StatusNc, {
       message:
-        'status deve ser um valor de enum válido: 0 - ABERTA, 1 - EM_TRABALHO, 2 - AGUARDANDO, 3 - VERIFICACAO, 4 - ENCERRADA, 5 - CANCELADA',
+        'status deve ser um valor de enum válido: 0 - ABERTA, 1 - EM_TRATAMENTO, 2 - AGUARDANDO_VERIFICACAO, 3 - ENCERRADA, 4 - CANCELADA',
     })
     .optional(),
 

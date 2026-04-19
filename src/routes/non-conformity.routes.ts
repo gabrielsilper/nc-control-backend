@@ -3,11 +3,15 @@ import { validateBody } from 'middlewares/validate-body.middleware';
 import { validateParams } from 'middlewares/validate-params.middleware';
 import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
+import CorrectiveActionRepository from 'repositories/corrective-action.repository';
+import { createCorrectiveActionParamsSchema } from 'schemas/corrective-action-params.schema';
+import { createCorrectiveActionSchema } from 'schemas/create-corrective-action.schema';
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
 import { findByIdParamsSchema } from 'schemas/find-by-id-params.schema';
 import { findNonConformitiesQuerySchema, rankingLimitQuerySchema } from 'schemas/non-conformities-queries.schema';
 import { assignParamsSchema, updateDueDateParamsSchema, updateStatusParamsSchema } from 'schemas/non-conformity-params.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
+import CorrectiveActionService from 'services/corrective-action.service';
 import { TokenService } from 'services/token.service';
 import NonConformityController from '../controllers/non-conformity.controller';
 import NonConformityRepository from '../repositories/non-conformity.repository';
@@ -20,8 +24,10 @@ const encrypter = new Bcrypt();
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository, encrypter);
 const nonConformityRepository = new NonConformityRepository();
+const correctiveActionRepository = new CorrectiveActionRepository();
 const nonConformityService = new NonConformityService(nonConformityRepository, userService);
-const nonConformityController = new NonConformityController(nonConformityService);
+const correctiveActionService = new CorrectiveActionService(correctiveActionRepository, nonConformityService, userService);
+const nonConformityController = new NonConformityController(nonConformityService, correctiveActionService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(new TokenService());
 
 const nonConformityRoutes = Router();
@@ -52,6 +58,17 @@ nonConformityRoutes.patch('/:id/assign/:userId', validateParams(assignParamsSche
 );
 nonConformityRoutes.patch('/:id/due-date/:date', validateParams(updateDueDateParamsSchema), (req, res) =>
   nonConformityController.updateDueDate(req, res),
+);
+
+nonConformityRoutes.post(
+  '/:ncId/corrective-actions',
+  validateParams(createCorrectiveActionParamsSchema),
+  validateBody(createCorrectiveActionSchema),
+  (req, res) => nonConformityController.createCorrectiveAction(req, res),
+);
+
+nonConformityRoutes.get('/:ncId/corrective-actions', validateParams(createCorrectiveActionParamsSchema), (req, res) =>
+  nonConformityController.findCorrectiveActionByNc(req, res),
 );
 
 export default nonConformityRoutes;

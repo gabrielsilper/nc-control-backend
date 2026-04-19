@@ -408,7 +408,7 @@ async function run() {
 
     const assignedCount = itemsToInsert.filter((item) => item.assignedToId).length;
     const expiredCount = itemsToInsert.filter(
-      (item) => item.dueDate && item.dueDate < new Date() && item.status !== StatusNc.ENCERRADA,
+      (item) => item.dueDate && item.dueDate < new Date() && ![StatusNc.ENCERRADA, StatusNc.CANCELADA].includes(item.status),
     ).length;
 
     console.log(`${itemsToInsert.length} nao conformidades inseridas com sucesso.`);

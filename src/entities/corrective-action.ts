@@ -1,4 +1,4 @@
-import { Status } from 'enums/status.enum';
+import { StatusCa } from 'enums/status.enum';
 import {
   Column,
   CreateDateColumn,
@@ -22,11 +22,11 @@ export default class CorrectiveAction {
 
   @Column({
     type: 'enum',
-    enum: Status,
-    default: Status.PENDENTE,
+    enum: StatusCa,
+    default: StatusCa.PENDENTE,
     nullable: false,
   })
-  status!: string;
+  status!: StatusCa;
 
   @Column({ type: 'timestamptz', nullable: false })
   deadline!: Date;
@@ -48,7 +48,7 @@ export default class CorrectiveAction {
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'assignee_id' })
-  assignee!: User;
+  assignee!: User | null;
 
   @Column({ type: 'timestamptz', nullable: true, name: 'finished_at' })
   finishedAt?: Date;

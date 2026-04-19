@@ -1,5 +1,6 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
+import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
@@ -8,7 +9,6 @@ import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import UserService from './user.service';
-import { TypeNc } from 'enums/type_nc.enum';
 
 export default class NonConformityService {
   constructor(
@@ -19,15 +19,7 @@ export default class NonConformityService {
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
     const user = await this.userService.findById(userId);
 
-    this.validateNumberExists(nonConformityData.number);
-
-    const ncExists = await this.nonConformityRepository.existsBy({
-      number: nonConformityData.number,
-    });
-
-    if (ncExists) {
-      throw new NonConformityNumberAlreadyExistsError();
-    }
+    await this.validateNumberExists(nonConformityData.number);
 
     const nonConformity = this.nonConformityRepository.create({
       ...nonConformityData,
@@ -107,13 +99,13 @@ export default class NonConformityService {
     const { status, ...restOfData } = nonConformityData;
 
     if (nonConformityData.number && nonConformityData.number !== nonConformity.number) {
-      this.validateNumberExists(nonConformityData.number);
+      await this.validateNumberExists(nonConformityData.number);
     }
 
     const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
     const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
 
-    if (!status) {
+    if (status === undefined) {
       return savedNonConformity;
     }
 
