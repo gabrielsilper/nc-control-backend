@@ -1,5 +1,6 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
+import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
@@ -8,7 +9,6 @@ import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import UserService from './user.service';
-import { TypeNc } from 'enums/type_nc.enum';
 
 export default class NonConformityService {
   constructor(
