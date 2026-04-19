@@ -61,13 +61,13 @@ nonConformityRoutes.patch('/:id/due-date/:date', validateParams(updateDueDatePar
 );
 
 nonConformityRoutes.post(
-  '/:ncId/correctiveAction',
+  '/:ncId/corrective-actions',
   validateParams(createCorrectiveActionParamsSchema),
   validateBody(createCorrectiveActionSchema),
   (req, res) => nonConformityController.createCorrectiveAction(req, res),
 );
 
-nonConformityRoutes.get('/:ncId/correctiveAction', validateParams(createCorrectiveActionParamsSchema), (req, res) =>
+nonConformityRoutes.get('/:ncId/corrective-actions', validateParams(createCorrectiveActionParamsSchema), (req, res) =>
   nonConformityController.findCorrectiveActionByNc(req, res),
 );
 
