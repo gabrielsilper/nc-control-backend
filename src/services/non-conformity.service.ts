@@ -1,7 +1,8 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
-import { StatusNc } from 'enums/status_nc.enum';
+import { allowedTransitions, StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
+import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NonConformityRepository from 'repositories/non-conformity.repository';
@@ -120,12 +121,12 @@ export default class NonConformityService {
       return nonConformity;
     }
 
-    if (currentStatus === StatusNc.CANCELADA) {
+    if (!allowedTransitions(currentStatus).includes(nextStatus)) {
       throw new InvalidNonConformityStatusTransitionError(currentStatus, nextStatus);
     }
 
-    if (currentStatus === StatusNc.ENCERRADA && nextStatus !== StatusNc.ABERTA) {
-      throw new InvalidNonConformityStatusTransitionError(currentStatus, nextStatus);
+    if (nextStatus === StatusNc.ENCERRADA && !nonConformity.rootCause) {
+      throw new NonConformityMissingRootCauseError();
     }
 
     nonConformity.closedAt = nextStatus === StatusNc.ENCERRADA ? new Date() : null;

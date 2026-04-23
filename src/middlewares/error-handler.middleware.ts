@@ -1,6 +1,7 @@
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
+import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import RefreshTokenValidationError from 'errors/refresh-token-validation.error';
@@ -24,12 +25,15 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  if (
-    error instanceof EmailAlreadyExistsError ||
-    error instanceof NonConformityNumberAlreadyExistsError ||
-    error instanceof InvalidNonConformityStatusTransitionError
-  ) {
+  if (error instanceof EmailAlreadyExistsError || error instanceof NonConformityNumberAlreadyExistsError) {
     return res.status(409).json({
+      error: error.name,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof InvalidNonConformityStatusTransitionError || error instanceof NonConformityMissingRootCauseError) {
+    return res.status(400).json({
       error: error.name,
       message: error.message,
     });
