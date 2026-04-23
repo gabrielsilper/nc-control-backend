@@ -2,6 +2,7 @@ import { Profile } from 'enums/profile.enum';
 import { Router } from 'express';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { validateProfileAuth } from 'middlewares/validate-profile-auth.middleware';
+import { validateSelfOrGestor } from 'middlewares/validate-self-or-gestor.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { createUserSchema } from 'schemas/create-user.schema';
 import { updateUserSchema } from 'schemas/update-user.schema';
@@ -18,11 +19,28 @@ const userController = new UserController(userService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(new TokenService());
 
 const userRoutes = Router();
-userRoutes.post('/', validateBody(createUserSchema), (req, res) => userController.create(req, res));
 
-// Ainda definir como vai ser feito, para somente gestor e o próprio funcionário possa fazer essas requisições.
-userRoutes.get('/:id', (req, res) => userController.getById(req, res));
-userRoutes.put('/:id', validateBody(updateUserSchema), (req, res) => userController.update(req, res));
+userRoutes.post(
+  '/',
+  (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  validateProfileAuth(Profile.GESTOR),
+  validateBody(createUserSchema),
+  (req, res) => userController.create(req, res),
+);
+
+userRoutes.get(
+  '/:id',
+  (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  validateSelfOrGestor,
+  (req, res) => userController.getById(req, res),
+);
+userRoutes.put(
+  '/:id',
+  (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  validateSelfOrGestor,
+  validateBody(updateUserSchema),
+  (req, res) => userController.update(req, res),
+);
 
 userRoutes.get(
   '/',

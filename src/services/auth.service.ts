@@ -32,11 +32,11 @@ export default class AuthService {
 
     if (currentRefreshToken) {
       const refreshToken = await this.refreshTokenService.refresh(currentRefreshToken, ipAddress);
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, user: { id: user.id, profile: user.profile } };
     }
 
     const refreshToken = await this.refreshTokenService.create(user.id, userAgent, ipAddress);
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user: { id: user.id, profile: user.profile } };
   }
 
   async refresh(refreshToken: string, userAgent: string, ipAddress: string): Promise<ResponseTokensDTO> {
@@ -69,6 +69,7 @@ export default class AuthService {
     return {
       accessToken,
       refreshToken: newRefreshToken,
+      user: { id: storedToken.userId, profile: storedToken.user.profile },
     };
   }
 

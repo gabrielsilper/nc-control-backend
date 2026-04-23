@@ -1,6 +1,8 @@
+import { Profile } from 'enums/profile.enum';
 import { Router } from 'express';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { validateParams } from 'middlewares/validate-params.middleware';
+import { validateProfileAuth } from 'middlewares/validate-profile-auth.middleware';
 import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import CorrectiveActionRepository from 'repositories/corrective-action.repository';
@@ -39,29 +41,36 @@ nonConformityRoutes.get('/', validateQuery(findNonConformitiesQuerySchema), (req
   nonConformityController.findAll(req, res),
 );
 
-nonConformityRoutes.get('/counts', (req, res) => nonConformityController.getDashboardCounts(req, res));
-nonConformityRoutes.get('/ranking', validateQuery(rankingLimitQuerySchema), (req, res) =>
+nonConformityRoutes.get('/counts', validateProfileAuth(Profile.GESTOR), (req, res) =>
+  nonConformityController.getDashboardCounts(req, res),
+);
+nonConformityRoutes.get('/ranking', validateProfileAuth(Profile.GESTOR), validateQuery(rankingLimitQuerySchema), (req, res) =>
   nonConformityController.getDashboardTypeRanking(req, res),
 );
 
 nonConformityRoutes.get('/:id', validateParams(findByIdParamsSchema), (req, res) => nonConformityController.findById(req, res));
 
-nonConformityRoutes.put('/:id', validateParams(findByIdParamsSchema), validateBody(updateNonConformitySchema), (req, res) =>
-  nonConformityController.update(req, res),
+nonConformityRoutes.put(
+  '/:id',
+  validateProfileAuth(Profile.RESPONSAVEL),
+  validateParams(findByIdParamsSchema),
+  validateBody(updateNonConformitySchema),
+  (req, res) => nonConformityController.update(req, res),
 );
 
-nonConformityRoutes.patch('/:id/status/:status', validateParams(updateStatusParamsSchema), (req, res) =>
+nonConformityRoutes.patch('/:id/status/:status', validateProfileAuth(Profile.RESPONSAVEL), validateParams(updateStatusParamsSchema), (req, res) =>
   nonConformityController.updateStatus(req, res),
 );
-nonConformityRoutes.patch('/:id/assign/:userId', validateParams(assignParamsSchema), (req, res) =>
+nonConformityRoutes.patch('/:id/assign/:userId', validateProfileAuth(Profile.GESTOR), validateParams(assignParamsSchema), (req, res) =>
   nonConformityController.assign(req, res),
 );
-nonConformityRoutes.patch('/:id/due-date/:date', validateParams(updateDueDateParamsSchema), (req, res) =>
+nonConformityRoutes.patch('/:id/due-date/:date', validateProfileAuth(Profile.GESTOR), validateParams(updateDueDateParamsSchema), (req, res) =>
   nonConformityController.updateDueDate(req, res),
 );
 
 nonConformityRoutes.post(
   '/:ncId/corrective-actions',
+  validateProfileAuth(Profile.RESPONSAVEL),
   validateParams(createCorrectiveActionParamsSchema),
   validateBody(createCorrectiveActionSchema),
   (req, res) => nonConformityController.createCorrectiveAction(req, res),

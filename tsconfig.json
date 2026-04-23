@@ -15,7 +15,8 @@
     /* Imports e paths */
     "baseUrl": "./src",
 
-    /* Output (caso compile) */
+    /* Input e Output (caso compile) */
+    "rootDir": "./src",
     "outDir": "./dist",
 
     /* Type safety */
@@ -28,7 +29,8 @@
     "resolveJsonModule": true,
 
     /* Qualidade */
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
