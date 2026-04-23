@@ -49,10 +49,5 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  return res.status(500).json({
-    // TODO - Remover o stack e message futuramente
-    message: 'Internal server error',
-    error: error.message,
-    stack: error.stack,
-  });
+  return res.status(500).json({ message: 'Internal server error' });
 }

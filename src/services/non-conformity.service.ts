@@ -156,7 +156,10 @@ export default class NonConformityService {
     const raw = await this.nonConformityRepository
       .createQueryBuilder('nc')
       .select('COUNT(CASE WHEN nc.status = :openStatus THEN 1 END)', 'openNonConformities')
-      .addSelect('COUNT(CASE WHEN nc.severity IN (:...severities) THEN 1 END)', 'warningNonConformities')
+      .addSelect(
+        'COUNT(CASE WHEN nc.severity IN (:...severities) AND nc.status NOT IN (:...closedStatus) THEN 1 END)',
+        'warningNonConformities',
+      )
       .addSelect(
         'COUNT(CASE WHEN nc.dueDate < CURRENT_DATE AND nc.status NOT IN (:...closedStatus) THEN 1 END)',
         'expiredNonConformities',
