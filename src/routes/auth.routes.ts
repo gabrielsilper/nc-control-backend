@@ -22,7 +22,7 @@ const refreshTokenRepository = new RefreshTokenRepository();
 const tokenService = new TokenService();
 const refreshTokenService = new RefreshTokenService(refreshTokenRepository, tokenService, expiresDays);
 const authService = new AuthService(userService, refreshTokenService, tokenService, encrypter);
-const authController = new AuthController(authService);
+const authController = new AuthController(authService, userService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(tokenService);
 
 const authRoutes = Router();
@@ -34,6 +34,12 @@ authRoutes.post(
   '/logout/all',
   (req, res, next) => validateTokenMiddleware.handle(req, res, next),
   (req, res) => authController.logoutAll(req, res),
+);
+
+authRoutes.get(
+  '/me',
+  (req, res, next) => validateTokenMiddleware.handle(req, res, next),
+  (req, res) => authController.me(req, res),
 );
 
 export default authRoutes;

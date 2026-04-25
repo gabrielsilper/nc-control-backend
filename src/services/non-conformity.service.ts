@@ -3,8 +3,8 @@ import { allowedTransitions, StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
-import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
+import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
 import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
@@ -14,16 +14,17 @@ import UserService from './user.service';
 export default class NonConformityService {
   constructor(
     private readonly nonConformityRepository: NonConformityRepository,
+    private readonly ncYearSequenceRepository: NcYearSequenceRepository,
     private readonly userService: UserService,
   ) {}
 
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
     const user = await this.userService.findById(userId);
-
-    await this.validateNumberExists(nonConformityData.number);
+    const number = await this.generateNumber();
 
     const nonConformity = this.nonConformityRepository.create({
       ...nonConformityData,
+      number,
       createdBy: user,
     });
 
@@ -98,10 +99,6 @@ export default class NonConformityService {
   async update(id: string, nonConformityData: UpdateNonConformityDTO) {
     const nonConformity = await this.findById(id);
     const { status, ...restOfData } = nonConformityData;
-
-    if (nonConformityData.number && nonConformityData.number !== nonConformity.number) {
-      await this.validateNumberExists(nonConformityData.number);
-    }
 
     const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
     const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
@@ -198,14 +195,10 @@ export default class NonConformityService {
     }));
   }
 
-  private async validateNumberExists(number: string) {
-    const ncExists = await this.nonConformityRepository.existsBy({
-      number,
-    });
-
-    if (ncExists) {
-      throw new NonConformityNumberAlreadyExistsError();
-    }
+  private async generateNumber(): Promise<string> {
+    const year = new Date().getFullYear();
+    const seq = await this.ncYearSequenceRepository.nextSequence(year);
+    return `NC-${year}-${String(seq).padStart(4, '0')}`;
   }
 
   private getCurrentMonth() {
