@@ -102,21 +102,6 @@ converter `DELETE /users/:id` em soft-delete (set `active = false`).
 
 ---
 
-## 7. Endpoint `/auth/me` (ou retorno completo do usuário no login)
-
-**O que existe hoje:** `LoginResponse` retorna apenas `{ id, profile }` no
-campo `user`. O nome do usuário não é retornado nem há rota para buscar o
-perfil do logado.
-
-**O que o PRD pede:** a tela "Meu perfil" e o sidebar/header precisam
-mostrar nome e e-mail do usuário logado.
-
-**Ação sugerida:** incluir `name` e `email` em `LoginResponse.user` ou
-criar `GET /auth/me` (protegido) que devolve o `User` completo baseado no
-`sub` do JWT.
-
----
-
 ## 8. CRUD completo de ações corretivas (US09/US10 — trio)
 
 **O que existe hoje:**
