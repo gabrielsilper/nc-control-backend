@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { appDataSource } from 'database/app-data-source';
+import NcYearSequence from 'entities/nc-year-sequence';
 import NonConformity from 'entities/non-conformity';
 import User from 'entities/user';
 import { Profile } from 'enums/profile.enum';
@@ -405,6 +406,21 @@ async function run() {
     );
 
     await nonConformityRepository.save(entities);
+
+    const sequenceRepository = appDataSource.getRepository(NcYearSequence);
+    const allNcs = await nonConformityRepository.find({ select: { number: true } });
+    const seqByYear = new Map<number, number>();
+    for (const nc of allNcs) {
+      const parts = nc.number.split('-');
+      const year = parseInt(parts[1], 10);
+      const seq = parseInt(parts[2], 10);
+      if (!seqByYear.has(year) || seq > (seqByYear.get(year) ?? 0)) {
+        seqByYear.set(year, seq);
+      }
+    }
+    for (const [year, lastSeq] of seqByYear) {
+      await sequenceRepository.upsert({ year, lastSeq }, ['year']);
+    }
 
     const assignedCount = itemsToInsert.filter((item) => item.assignedToId).length;
     const expiredCount = itemsToInsert.filter(

@@ -6,6 +6,7 @@ import { validateProfileAuth } from 'middlewares/validate-profile-auth.middlewar
 import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import CorrectiveActionRepository from 'repositories/corrective-action.repository';
+import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
 import { createCorrectiveActionParamsSchema } from 'schemas/corrective-action-params.schema';
 import { createCorrectiveActionSchema } from 'schemas/create-corrective-action.schema';
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
@@ -26,8 +27,9 @@ const encrypter = new Bcrypt();
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository, encrypter);
 const nonConformityRepository = new NonConformityRepository();
+const ncYearSequenceRepository = new NcYearSequenceRepository();
 const correctiveActionRepository = new CorrectiveActionRepository();
-const nonConformityService = new NonConformityService(nonConformityRepository, userService);
+const nonConformityService = new NonConformityService(nonConformityRepository, ncYearSequenceRepository, userService);
 const correctiveActionService = new CorrectiveActionService(correctiveActionRepository, nonConformityService, userService);
 const nonConformityController = new NonConformityController(nonConformityService, correctiveActionService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(new TokenService());

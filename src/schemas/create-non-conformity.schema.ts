@@ -3,10 +3,6 @@ import { SeverityNc } from '../enums/severity_nc.enum';
 import { TypeNc } from '../enums/type_nc.enum';
 
 export const createNonConformitySchema = z.object({
-  number: z
-    .string('number é obrigatório e deve ser uma string')
-    .regex(/^NC-\d{4}-\d{6}$/, 'number deve seguir o padrão NC-0000-000000. Exemplo: NC-1234-123456'),
-
   title: z.string('title é obrigatório e deve ser uma string').min(3, 'title deve ter no mínimo 3 caracteres'),
 
   description: z

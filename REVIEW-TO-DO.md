@@ -7,25 +7,6 @@ documentado.
 
 ---
 
-## 1. Geração automática do número da NC (RF03)
-
-**O que existe hoje:** o endpoint `POST /non-conformities` exige que o cliente
-envie o campo `number`, validado por `createNonConformitySchema`
-(`NC-\d{4}-\d{6}`). O frontend é obrigado a pedir isso no formulário.
-
-**O que o PRD pede:** o número deve ser gerado pelo backend no padrão
-`NC-YYYY-NNNN` (sequencial por ano), de forma que o inspetor não precise
-digitá-lo (ver RF03 e "Tela 3/4: Não Conformidades → O número é gerado
-automaticamente pelo backend").
-
-**Por quê:** garantir unicidade, evitar erro de digitação, cumprir auditoria
-ISO 9001 com numeração rastreável.
-
-**Ação sugerida:** remover `number` do `createNonConformitySchema` e gerar no
-service com `SELECT MAX(number)` filtrado por ano ou via sequence postgres.
-
----
-
 ## 2. Transição automática de status ao atribuir responsável (US02)
 
 **O que existe hoje:** `PATCH /non-conformities/:id/assign/:userId` só
@@ -145,20 +126,6 @@ inserir linha a cada mudança. Endpoint `GET /non-conformities/:id/history`.
 
 ---
 
-## 11. Resposta com wrapper `{ data, meta }`
-
-**O que existe hoje:** respostas retornam o payload direto
-(`ResponseNonConformityDTO`, arrays, etc.).
-
-**O que o CLAUDE.md cita:** contrato `{ data, meta }` planejado mas não
-implementado.
-
-**Ação sugerida:** decidir se adota e, se adotar, aplicar em todos os
-controllers de forma consistente (mappers/interceptor). Requer ajuste no
-frontend em sincronia.
-
----
-
 ## 12. Mapeamento de erros de constraint → 400/409
 
 **O que existe hoje:** erros de constraint (unique violation de `number`,
@@ -218,7 +185,3 @@ permitido para gestor.
 
 ---
 
-## 16. Paginação / ordenação / busca (já registrado em CLAUDE.md)
-
-Persistem: falta de pagination defaults coerentes (mínimo 10 é alto
-demais para telas pequenas — reduzir para 1) e de `sort` configurável.

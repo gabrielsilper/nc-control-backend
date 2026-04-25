@@ -4,11 +4,6 @@ import { StatusNc } from '../enums/status_nc.enum';
 import { TypeNc } from '../enums/type_nc.enum';
 
 export const updateNonConformitySchema = z.object({
-  number: z
-    .string('number deve ser uma string')
-    .regex(/^NC-\d{4}-\d{6}$/, 'number deve seguir o padrão NC-0000-000000. Exemplo: NC-1234-123456')
-    .optional(),
-
   title: z.string('title deve ser uma string').min(3, 'title deve ter no mínimo 3 caracteres').optional(),
 
   description: z.string('description deve ser uma string').min(3, 'description deve ter no mínimo 3 caracteres').optional(),

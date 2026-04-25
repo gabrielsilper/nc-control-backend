@@ -10,7 +10,7 @@ const orderValues = ['ASC', 'DESC'] as const;
 
 export const findNonConformitiesQuerySchema = z.object({
   page: z.coerce.number().int().min(1, 'Page deve ser maior ou igual a 1').default(1),
-  pageSize: z.coerce.number().int().min(10, 'Page size deve ser maior ou igual a 10').default(10),
+  pageSize: z.coerce.number().int().min(1, 'Page size deve ser maior ou igual a 1').default(10),
   order: z.enum(orderValues).default('ASC'),
   type: z.coerce
     .number()
