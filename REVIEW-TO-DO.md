@@ -101,18 +101,6 @@ a evidência". Critério: "Concluir exige preenchimento do campo evidência".
 
 ---
 
-## 9. Filtro `expired` como boolean
-
-**O que existe hoje:** `findNonConformitiesQuerySchema` aceita
-`expired=0|1` e converte para boolean.
-
-**O que o PRD pede:** padrão REST é `?expired=true|false`.
-
-**Ação sugerida:** aceitar `true`/`false` (via `z.coerce.boolean()` com
-refinamento) — é backwards-compatible se mantiver aceitando 0/1.
-
----
-
 ## 10. Endpoint de histórico (RF14 — trio)
 
 **O que existe hoje:** não existe.
