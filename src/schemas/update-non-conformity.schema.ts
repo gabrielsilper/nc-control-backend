@@ -10,7 +10,7 @@ export const updateNonConformitySchema = z.object({
 
   type: z
     .enum(TypeNc, {
-      message: 'type deve ser um valor de enum válido: 0 - PRODUTO, 1 - PROCESSO, 2 - MATERIAL, 3 - SEGURANÇA, 4 - OUTRO',
+      message: 'type deve ser um valor de enum válido: 0 - PRODUTO, 1 - PROCESSO, 2 - MATERIAL, 3 - SEGURANCA, 4 - OUTRO',
     })
     .optional(),
 

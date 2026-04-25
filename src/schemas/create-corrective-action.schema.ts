@@ -16,7 +16,7 @@ export const createCorrectiveActionSchema = z.object({
 
   evidence: z.string('evidence deve ser uma string').min(3, 'evidence deve ter no mínimo 3 caracteres').optional(),
 
-  assigneeId: z.string('assignedId deve ser uma string').uuid('assignedId deve ser um UUID válido'),
+  assigneeId: z.string('assigneeId deve ser uma string').uuid('assigneeId deve ser um UUID válido'),
 });
 
-export type CreateCorrectiveActionDto = z.infer<typeof createCorrectiveActionSchema>;
+export type CreateCorrectiveActionDTO = z.infer<typeof createCorrectiveActionSchema>;
