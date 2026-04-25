@@ -1,5 +1,5 @@
 import CorrectiveActionRepository from 'repositories/corrective-action.repository';
-import { CreateCorrectiveActionDto } from 'schemas/create-corrective-action.schema';
+import { CreateCorrectiveActionDTO } from 'schemas/create-corrective-action.schema';
 import NonConformityService from './non-conformity.service';
 import UserService from './user.service';
 
@@ -16,7 +16,7 @@ export default class CorrectiveActionService {
     return this.correctiveActionRepository.findBy({ nonConformity });
   }
 
-  async create(nonConformityId: string, correctiveActionData: CreateCorrectiveActionDto) {
+  async create(nonConformityId: string, correctiveActionData: CreateCorrectiveActionDTO) {
     const nonConformity = await this.nonConformityService.findById(nonConformityId);
     const assignee = await this.userService.findById(correctiveActionData.assigneeId);
 

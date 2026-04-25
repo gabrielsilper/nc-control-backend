@@ -10,7 +10,7 @@ export const createNonConformitySchema = z.object({
     .min(3, 'description deve ter no mínimo 3 caracteres'),
 
   type: z.enum(TypeNc, {
-    message: 'type deve ser um valor de enum válido: 0 - PRODUTO, 1 - PROCESSO, 2 - MATERIAL, 3 - SEGURANÇA, 4 - OUTRO',
+    message: 'type deve ser um valor de enum válido: 0 - PRODUTO, 1 - PROCESSO, 2 - MATERIAL, 3 - SEGURANCA, 4 - OUTRO',
   }),
 
   severity: z.enum(SeverityNc, {

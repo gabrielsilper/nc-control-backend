@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { correctiveActionToResponseDto } from 'mappers/corrective-action.mapper';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateCorrectiveActionParams } from 'schemas/corrective-action-params.schema';
-import { CreateCorrectiveActionDto } from 'schemas/create-corrective-action.schema';
+import { CreateCorrectiveActionDTO } from 'schemas/create-corrective-action.schema';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindByIdParams } from 'schemas/find-by-id-params.schema';
 import { FindNonConformitiesQuery, RankingLimitQuery } from 'schemas/non-conformities-queries.schema';
@@ -29,7 +29,7 @@ export default class NonConformityController {
 
   async createCorrectiveAction(req: Request, res: Response) {
     const { ncId } = req.params as CreateCorrectiveActionParams;
-    const correctiveActionData = req.body as CreateCorrectiveActionDto;
+    const correctiveActionData = req.body as CreateCorrectiveActionDTO;
 
     const newCorrectiveAction = await this.correctiveActionService.create(ncId, correctiveActionData);
     return res.status(201).json(correctiveActionToResponseDto(newCorrectiveAction));
