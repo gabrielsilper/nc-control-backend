@@ -158,6 +158,34 @@ CANCELADA)`. Se quiser manter a semântica atual, renomear a chave para
 
 ---
 
+## 16. Bloquear `EM_TRATAMENTO → AGUARDANDO_VERIFICACAO` se houver ação corretiva pendente
+
+**O que existe hoje:** `updateStatus` valida apenas o grafo de transições
+em `allowedTransitions`. Uma NC pode ir para `AGUARDANDO_VERIFICACAO`
+mesmo com ações corretivas em `PENDENTE` ou `EM_ANDAMENTO` — basta o
+gestor/responsável disparar o PATCH de status.
+
+**O que o PRD pede:** o ciclo de vida prevê que `AGUARDANDO_VERIFICACAO`
+só faz sentido após o plano de ação ser executado. Se sobrar qualquer
+ação não concluída, a verificação é prematura — o gestor está sendo
+chamado a verificar trabalho que ainda não terminou.
+
+**Por quê:** evita "fechar parcialmente" uma NC. Hoje o responsável
+poderia esquecer ações no meio do caminho e mover a NC para verificação,
+e o gestor não tem como saber sem abrir o detalhe.
+
+**Ação sugerida:** em `nonConformityService.updateStatus`, quando
+`nextStatus === AGUARDANDO_VERIFICACAO`, consultar
+`correctiveActionRepository.count({ where: { nonConformityId: id, status: Not(StatusCa.CONCLUIDA) } })`
+e rejeitar com 400 se for > 0. Mensagem clara apontando quantas ações
+ainda estão pendentes. Caso a NC não tenha **nenhuma** ação registrada,
+decidir com o time se deve bloquear também (provavelmente sim — sem
+plano, não há o que verificar).
+
+> Relacionado ao item 8 (CRUD completo de ações corretivas).
+
+---
+
 ## 15. Transição `AGUARDANDO_VERIFICACAO → CANCELADA` ausente
 
 **O que existe hoje:** em `allowedTransitions`, `AGUARDANDO_VERIFICACAO`

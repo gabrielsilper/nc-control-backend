@@ -1,6 +1,10 @@
+import { CorrectiveActionForbiddenError } from 'errors/corrective-action-forbidden.error';
+import { CorrectiveActionMissingEvidenceError } from 'errors/corrective-action-missing-evidence.error';
+import { CorrectiveActionNotFoundError } from 'errors/corrective-action-not-found.error';
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
+import { NcMissingAssigneeError } from 'errors/nc-missing-assignee.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
@@ -18,8 +22,19 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  if (error instanceof UserNotFoundError || error instanceof NonConformityNotFoundError) {
+  if (
+    error instanceof UserNotFoundError ||
+    error instanceof NonConformityNotFoundError ||
+    error instanceof CorrectiveActionNotFoundError
+  ) {
     return res.status(404).json({
+      error: error.name,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof CorrectiveActionForbiddenError) {
+    return res.status(403).json({
       error: error.name,
       message: error.message,
     });
@@ -32,7 +47,12 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  if (error instanceof InvalidNonConformityStatusTransitionError || error instanceof NonConformityMissingRootCauseError) {
+  if (
+    error instanceof InvalidNonConformityStatusTransitionError ||
+    error instanceof NonConformityMissingRootCauseError ||
+    error instanceof NcMissingAssigneeError ||
+    error instanceof CorrectiveActionMissingEvidenceError
+  ) {
     return res.status(400).json({
       error: error.name,
       message: error.message,

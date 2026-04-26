@@ -13,6 +13,10 @@ import { createNonConformitySchema } from 'schemas/create-non-conformity.schema'
 import { findByIdParamsSchema } from 'schemas/find-by-id-params.schema';
 import { findNonConformitiesQuerySchema, rankingLimitQuerySchema } from 'schemas/non-conformities-queries.schema';
 import { assignParamsSchema, updateDueDateParamsSchema, updateStatusParamsSchema } from 'schemas/non-conformity-params.schema';
+import {
+  updateCorrectiveActionParamsSchema,
+  updateCorrectiveActionSchema,
+} from 'schemas/update-corrective-action.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import CorrectiveActionService from 'services/corrective-action.service';
 import { TokenService } from 'services/token.service';
@@ -80,6 +84,13 @@ nonConformityRoutes.post(
 
 nonConformityRoutes.get('/:ncId/corrective-actions', validateParams(createCorrectiveActionParamsSchema), (req, res) =>
   nonConformityController.findCorrectiveActionByNc(req, res),
+);
+
+nonConformityRoutes.patch(
+  '/:ncId/corrective-actions/:caId',
+  validateParams(updateCorrectiveActionParamsSchema),
+  validateBody(updateCorrectiveActionSchema),
+  (req, res) => nonConformityController.updateCorrectiveAction(req, res),
 );
 
 export default nonConformityRoutes;
