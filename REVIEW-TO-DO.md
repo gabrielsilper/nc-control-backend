@@ -158,6 +158,45 @@ CANCELADA)`. Se quiser manter a semântica atual, renomear a chave para
 
 ---
 
+## 16. Assignee name ausente na resposta de ações corretivas
+
+**O que existe hoje:** `correctiveActionToResponseDto` retorna apenas `assigneeId`. A relação
+`assignee` não é carregada no `findbyNc` (sem eager load).
+
+**O que o frontend precisa:** exibir o nome do responsável pela ação na tela de detalhe da NC.
+
+**Ação sugerida:** no `CorrectiveActionService.findbyNc`, usar `findBy` com `relations: ['assignee']`
+e adicionar `assignee: { id: string; name: string }` ao `ResponseCorrectiveActionDTO` e ao mapper.
+
+---
+
+## 17. PATCH /corrective-actions/:id — marcar ação como concluída (US10)
+
+**O que existe hoje:** só há `POST` (criar) e `GET` (listar). Não é possível atualizar status
+ou registrar evidência após a criação.
+
+**O que o PRD pede:** US10 — "marcar minha ação como concluída e registrar a evidência".
+Critério: "Concluir exige preenchimento do campo evidência".
+
+**Ação sugerida:** implementar `PATCH /non-conformities/:ncId/corrective-actions/:id` (ou
+rota direta `/corrective-actions/:id`) aceitando `{ status, evidence }`. Validar no service
+que `status = CONCLUIDA` só é aceito com `evidence` preenchido. Preencher `finishedAt`
+automaticamente.
+
+---
+
+## 18. createdBy ausente na resposta de NC
+
+**O que existe hoje:** `nonConformityToResponseDto` retorna `createdById` (UUID), mas não o
+objeto `createdBy` com nome e perfil.
+
+**O que o frontend precisa:** exibir "Aberta por: Nome do usuário" na tela de detalhe.
+
+**Ação sugerida:** eager-load a relação `createdBy` no `findById` e incluir
+`createdBy: { id: string; name: string }` no DTO de resposta e no mapper.
+
+---
+
 ## 15. Transição `AGUARDANDO_VERIFICACAO → CANCELADA` ausente
 
 **O que existe hoje:** em `allowedTransitions`, `AGUARDANDO_VERIFICACAO`
