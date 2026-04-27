@@ -59,6 +59,7 @@ export default class NonConformityService {
     if (expired !== undefined) {
       if (expired) {
         queryBuilder.andWhere('nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW()');
+        queryBuilder.andWhere('nonConformity.status not in (:...status)', { status: [StatusNc.CANCELADA, StatusNc.ENCERRADA]})
       } else {
         queryBuilder.andWhere('(nonConformity.dueDate IS NULL OR nonConformity.dueDate >= NOW())');
       }
