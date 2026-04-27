@@ -1,5 +1,6 @@
 import ResponseCorrectiveActionDTO from 'dtos/response-corrective-action.dto';
 import CorrectiveAction from 'entities/corrective-action';
+import { userToEmbeddedDto } from './user.mapper';
 
 export function correctiveActionToResponseDto(correctiveAction: CorrectiveAction): ResponseCorrectiveActionDTO {
   return {
@@ -9,7 +10,7 @@ export function correctiveActionToResponseDto(correctiveAction: CorrectiveAction
     deadline: correctiveAction.deadline,
     evidence: correctiveAction.evidence,
     nonConformityId: correctiveAction.nonConformityId,
-    assigneeId: correctiveAction.assigneeId,
+    assignee: userToEmbeddedDto(correctiveAction.assignee!),
     finishedAt: correctiveAction.finishedAt,
     createdAt: correctiveAction.createdAt,
     updatedAt: correctiveAction.updatedAt,
