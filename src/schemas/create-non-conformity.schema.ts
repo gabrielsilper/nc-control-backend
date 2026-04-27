@@ -24,8 +24,6 @@ export const createNonConformitySchema = z.object({
   department: z.string('department é obrigatório e deve ser uma string').min(3, 'department deve ter no mínimo 3 caracteres'),
 
   rootCause: z.string('rootCause deve ser uma string').min(3, 'rootCause deve ter no mínimo 3 caracteres').optional(),
-
-  assignedToId: z.string('assignedToId deve ser uma string').uuid('assignedToId deve ser um UUID válido').optional(),
 });
 
 export type CreateNonConformityDTO = z.infer<typeof createNonConformitySchema>;

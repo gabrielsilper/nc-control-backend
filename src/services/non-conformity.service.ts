@@ -33,7 +33,10 @@ export default class NonConformityService {
 
   async findAll(filters: FindNonConformitiesQuery) {
     const { page, pageSize, order, type, severity, status, assignedToId, expired, search } = filters;
-    const queryBuilder = this.nonConformityRepository.createQueryBuilder('nonConformity');
+    const queryBuilder = this.nonConformityRepository
+      .createQueryBuilder('nonConformity')
+      .leftJoinAndSelect('nonConformity.createdBy', 'createdBy')
+      .leftJoinAndSelect('nonConformity.assignedTo', 'assignedTo');
 
     if (type !== undefined) {
       queryBuilder.andWhere('nonConformity.type = :type', { type });
@@ -87,7 +90,10 @@ export default class NonConformityService {
   }
 
   async findById(id: string) {
-    const nonConformity = await this.nonConformityRepository.findOneBy({ id });
+    const nonConformity = await this.nonConformityRepository.findOne({
+      where: { id },
+      relations: ['createdBy', 'assignedTo'],
+    });
 
     if (!nonConformity) {
       throw new NonConformityNotFoundError();

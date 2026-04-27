@@ -1,6 +1,7 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
+import EmbeddedUserDTO from './embedded-user.dto';
 
 export default interface ResponseNonConformityDTO {
   id: string;
@@ -13,8 +14,8 @@ export default interface ResponseNonConformityDTO {
   processLine: string;
   department: string;
   rootCause?: string;
-  createdById: string;
-  assignedToId?: string;
+  createdBy: EmbeddedUserDTO;
+  assignedTo: EmbeddedUserDTO | null;
   openedAt: Date;
   dueDate?: Date;
   closedAt?: Date | null;

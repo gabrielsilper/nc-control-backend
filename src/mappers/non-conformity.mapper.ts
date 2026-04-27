@@ -1,5 +1,6 @@
 import ResponseNonConformityDTO from 'dtos/response-non-conformity.dto';
 import NonConformity from 'entities/non-conformity';
+import { userToEmbeddedDto } from './user.mapper';
 
 export function nonConformityToResponseDto(nonConformity: NonConformity): ResponseNonConformityDTO {
   return {
@@ -13,8 +14,8 @@ export function nonConformityToResponseDto(nonConformity: NonConformity): Respon
     processLine: nonConformity.processLine,
     department: nonConformity.department,
     rootCause: nonConformity.rootCause,
-    createdById: nonConformity.createdById,
-    assignedToId: nonConformity.assignedToId,
+    createdBy: userToEmbeddedDto(nonConformity.createdBy),
+    assignedTo: nonConformity.assignedTo ? userToEmbeddedDto(nonConformity.assignedTo) : null,
     openedAt: nonConformity.openedAt,
     dueDate: nonConformity.dueDate,
     closedAt: nonConformity.closedAt,
