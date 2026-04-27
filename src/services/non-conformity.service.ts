@@ -91,6 +91,27 @@ export default class NonConformityService {
     };
   }
 
+  async findMyQueue(userId: string) {
+    return this.nonConformityRepository
+      .createQueryBuilder('nonConformity')
+      .leftJoinAndSelect('nonConformity.createdBy', 'createdBy')
+      .leftJoinAndSelect('nonConformity.assignedTo', 'assignedTo')
+      .where('nonConformity.assignedToId = :userId', { userId })
+      .andWhere('nonConformity.status NOT IN (:...closedStatus)', {
+        closedStatus: [StatusNc.ENCERRADA, StatusNc.CANCELADA],
+      })
+      .orderBy(
+        `CASE
+          WHEN nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW() THEN 0
+          WHEN nonConformity.dueDate IS NULL THEN 2
+          ELSE 1
+        END`,
+        'ASC',
+      )
+      .addOrderBy('nonConformity.dueDate', 'ASC', 'NULLS LAST')
+      .getMany();
+  }
+
   async findById(id: string) {
     const nonConformity = await this.nonConformityRepository.findOne({
       where: { id },

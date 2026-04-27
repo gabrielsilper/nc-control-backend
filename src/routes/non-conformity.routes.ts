@@ -51,6 +51,7 @@ nonConformityRoutes.post('/', validateBody(createNonConformitySchema), (req, res
 nonConformityRoutes.get('/', validateQuery(findNonConformitiesQuerySchema), (req, res) =>
   nonConformityController.findAll(req, res),
 );
+nonConformityRoutes.get('/my-queue', (req, res) => nonConformityController.findMyQueue(req, res));
 
 nonConformityRoutes.get('/counts', validateProfileAuth(Profile.GESTOR), (req, res) =>
   nonConformityController.getDashboardCounts(req, res),
