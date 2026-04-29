@@ -7,7 +7,7 @@ import { CreateCorrectiveActionDTO } from 'schemas/create-corrective-action.sche
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindByIdParams } from 'schemas/find-by-id-params.schema';
 import { FindNonConformitiesQuery, RankingLimitQuery } from 'schemas/non-conformities-queries.schema';
-import { AssignParams, UpdateDueDateParams, UpdateStatusParams } from 'schemas/non-conformity-params.schema';
+import { AssignBodyDTO, AssignParams, UpdateDueDateParams, UpdateStatusParams } from 'schemas/non-conformity-params.schema';
 import { UpdateCorrectiveActionDTO, UpdateCorrectiveActionParams } from 'schemas/update-corrective-action.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
 import CorrectiveActionService from 'services/corrective-action.service';
@@ -29,10 +29,16 @@ export default class NonConformityController {
   }
 
   async createCorrectiveAction(req: Request, res: Response) {
+    const { sub, profile } = req.payload;
     const { ncId } = req.params as CreateCorrectiveActionParams;
     const correctiveActionData = req.body as CreateCorrectiveActionDTO;
 
-    const newCorrectiveAction = await this.correctiveActionService.create(ncId, correctiveActionData);
+    const newCorrectiveAction = await this.correctiveActionService.create(
+      ncId,
+      sub,
+      profile,
+      correctiveActionData,
+    );
     return res.status(201).json(correctiveActionToResponseDto(newCorrectiveAction));
   }
 
@@ -48,6 +54,12 @@ export default class NonConformityController {
     return res.status(200).json(response);
   }
 
+  async findMyQueue(req: Request, res: Response) {
+    const { sub } = req.payload;
+    const items = await this.nonConformityService.findMyQueue(sub);
+    return res.status(200).json(items.map((nonConformity) => nonConformityToResponseDto(nonConformity)));
+  }
+
   async findCorrectiveActionByNc(req: Request, res: Response) {
     const { ncId } = req.params as CreateCorrectiveActionParams;
 
@@ -57,11 +69,11 @@ export default class NonConformityController {
   }
 
   async updateCorrectiveAction(req: Request, res: Response) {
-    const { sub } = req.payload;
+    const { sub, profile } = req.payload;
     const { caId } = req.params as UpdateCorrectiveActionParams;
     const dto = req.body as UpdateCorrectiveActionDTO;
 
-    const updated = await this.correctiveActionService.update(caId, sub, dto);
+    const updated = await this.correctiveActionService.update(caId, sub, profile, dto);
     return res.status(200).json(correctiveActionToResponseDto(updated));
   }
 
@@ -81,9 +93,10 @@ export default class NonConformityController {
   }
 
   async assign(req: Request, res: Response) {
-    const { id, userId } = req.validatedParams as AssignParams;
+    const { id } = req.validatedParams as AssignParams;
+    const { assignedToId, dueDate } = req.body as AssignBodyDTO;
 
-    const nonConformity = await this.nonConformityService.assign(id, userId);
+    const nonConformity = await this.nonConformityService.assign(id, assignedToId, new Date(dueDate));
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 

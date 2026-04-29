@@ -12,7 +12,12 @@ import { createCorrectiveActionSchema } from 'schemas/create-corrective-action.s
 import { createNonConformitySchema } from 'schemas/create-non-conformity.schema';
 import { findByIdParamsSchema } from 'schemas/find-by-id-params.schema';
 import { findNonConformitiesQuerySchema, rankingLimitQuerySchema } from 'schemas/non-conformities-queries.schema';
-import { assignParamsSchema, updateDueDateParamsSchema, updateStatusParamsSchema } from 'schemas/non-conformity-params.schema';
+import {
+  assignBodySchema,
+  assignParamsSchema,
+  updateDueDateParamsSchema,
+  updateStatusParamsSchema,
+} from 'schemas/non-conformity-params.schema';
 import {
   updateCorrectiveActionParamsSchema,
   updateCorrectiveActionSchema,
@@ -46,6 +51,7 @@ nonConformityRoutes.post('/', validateBody(createNonConformitySchema), (req, res
 nonConformityRoutes.get('/', validateQuery(findNonConformitiesQuerySchema), (req, res) =>
   nonConformityController.findAll(req, res),
 );
+nonConformityRoutes.get('/my-queue', (req, res) => nonConformityController.findMyQueue(req, res));
 
 nonConformityRoutes.get('/counts', validateProfileAuth(Profile.GESTOR), (req, res) =>
   nonConformityController.getDashboardCounts(req, res),
@@ -67,8 +73,12 @@ nonConformityRoutes.put(
 nonConformityRoutes.patch('/:id/status/:status', validateProfileAuth(Profile.RESPONSAVEL), validateParams(updateStatusParamsSchema), (req, res) =>
   nonConformityController.updateStatus(req, res),
 );
-nonConformityRoutes.patch('/:id/assign/:userId', validateProfileAuth(Profile.GESTOR), validateParams(assignParamsSchema), (req, res) =>
-  nonConformityController.assign(req, res),
+nonConformityRoutes.patch(
+  '/:id/assign',
+  validateProfileAuth(Profile.GESTOR),
+  validateParams(assignParamsSchema),
+  validateBody(assignBodySchema),
+  (req, res) => nonConformityController.assign(req, res),
 );
 nonConformityRoutes.patch('/:id/due-date/:date', validateProfileAuth(Profile.GESTOR), validateParams(updateDueDateParamsSchema), (req, res) =>
   nonConformityController.updateDueDate(req, res),

@@ -1,3 +1,4 @@
+import { Profile } from 'enums/profile.enum';
 import { StatusCa } from 'enums/status.enum';
 import { CorrectiveActionForbiddenError } from 'errors/corrective-action-forbidden.error';
 import { CorrectiveActionMissingEvidenceError } from 'errors/corrective-action-missing-evidence.error';
@@ -26,12 +27,19 @@ export default class CorrectiveActionService {
     });
   }
 
-  async create(nonConformityId: string, correctiveActionData: CreateCorrectiveActionDTO) {
+  async create(
+    nonConformityId: string,
+    userId: string,
+    profile: Profile,
+    correctiveActionData: CreateCorrectiveActionDTO,
+  ) {
     const nonConformity = await this.nonConformityService.findById(nonConformityId);
 
     if (!nonConformity.assignedToId) {
       throw new NcMissingAssigneeError();
     }
+
+    this.ensureCanManageActionPlan(nonConformity.assignedToId, userId, profile);
 
     const assignee = await this.userService.findById(nonConformity.assignedToId);
 
@@ -44,19 +52,17 @@ export default class CorrectiveActionService {
     return this.correctiveActionRepository.save(correctiveAction);
   }
 
-  async update(caId: string, userId: string, dto: UpdateCorrectiveActionDTO) {
+  async update(caId: string, userId: string, profile: Profile, dto: UpdateCorrectiveActionDTO) {
     const action = await this.correctiveActionRepository.findOne({
       where: { id: caId },
-      relations: ['assignee'],
+      relations: ['assignee', 'nonConformity'],
     });
 
     if (!action) {
       throw new CorrectiveActionNotFoundError();
     }
 
-    if (action.assigneeId !== userId) {
-      throw new CorrectiveActionForbiddenError();
-    }
+    this.ensureCanManageActionPlan(action.nonConformity.assignedToId, userId, profile);
 
     const nextStatus = dto.status ?? action.status;
     const nextEvidence = dto.evidence ?? action.evidence;
@@ -80,5 +86,21 @@ export default class CorrectiveActionService {
     }
 
     return this.correctiveActionRepository.save(action);
+  }
+
+  private ensureCanManageActionPlan(
+    ncAssignedToId: string | null | undefined,
+    userId: string,
+    profile: Profile,
+  ) {
+    if (profile === Profile.GESTOR) {
+      return;
+    }
+
+    if (ncAssignedToId && ncAssignedToId === userId) {
+      return;
+    }
+
+    throw new CorrectiveActionForbiddenError();
   }
 }

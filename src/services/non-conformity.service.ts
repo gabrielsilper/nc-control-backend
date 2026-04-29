@@ -2,6 +2,7 @@ import { SeverityNc } from 'enums/severity_nc.enum';
 import { allowedTransitions, StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
+import { NonConformityMissingAssignmentRequirementsError } from 'errors/non-conformity-missing-assignment-requirements.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
@@ -90,6 +91,27 @@ export default class NonConformityService {
     };
   }
 
+  async findMyQueue(userId: string) {
+    return this.nonConformityRepository
+      .createQueryBuilder('nonConformity')
+      .leftJoinAndSelect('nonConformity.createdBy', 'createdBy')
+      .leftJoinAndSelect('nonConformity.assignedTo', 'assignedTo')
+      .where('nonConformity.assignedToId = :userId', { userId })
+      .andWhere('nonConformity.status NOT IN (:...closedStatus)', {
+        closedStatus: [StatusNc.ENCERRADA, StatusNc.CANCELADA],
+      })
+      .orderBy(
+        `CASE
+          WHEN nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW() THEN 0
+          WHEN nonConformity.dueDate IS NULL THEN 2
+          ELSE 1
+        END`,
+        'ASC',
+      )
+      .addOrderBy('nonConformity.dueDate', 'ASC', 'NULLS LAST')
+      .getMany();
+  }
+
   async findById(id: string) {
     const nonConformity = await this.nonConformityRepository.findOne({
       where: { id },
@@ -133,17 +155,28 @@ export default class NonConformityService {
       throw new NonConformityMissingRootCauseError();
     }
 
+    if (nextStatus === StatusNc.EM_TRATAMENTO) {
+      this.ensureAssignmentRequirements(nonConformity.assignedToId, nonConformity.dueDate);
+    }
+
     nonConformity.closedAt = nextStatus === StatusNc.ENCERRADA ? new Date() : null;
     nonConformity.status = nextStatus;
 
     return this.nonConformityRepository.save(nonConformity);
   }
 
-  async assign(id: string, userId: string) {
+  async assign(id: string, userId: string, dueDate: Date) {
     const nonConformity = await this.findById(id);
+    this.ensureAssignmentRequirements(userId, dueDate);
+
     const user = await this.userService.findById(userId);
 
     nonConformity.assignedTo = user;
+    nonConformity.dueDate = dueDate;
+
+    if (nonConformity.status === StatusNc.ABERTA) {
+      nonConformity.status = StatusNc.EM_TRATAMENTO;
+    }
 
     return this.nonConformityRepository.save(nonConformity);
   }
@@ -210,5 +243,11 @@ export default class NonConformityService {
 
   private getCurrentMonth() {
     return new Date().getMonth() + 1;
+  }
+
+  private ensureAssignmentRequirements(assignedToId?: string | null, dueDate?: Date | null) {
+    if (!assignedToId || !dueDate) {
+      throw new NonConformityMissingAssignmentRequirementsError();
+    }
   }
 }

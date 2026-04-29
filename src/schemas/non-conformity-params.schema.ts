@@ -17,9 +17,16 @@ export type UpdateStatusParams = z.infer<typeof updateStatusParamsSchema>;
 
 export const assignParamsSchema = z.object({
   id: z.string().uuid('ID da não conformidade deve ser um UUID válido'),
-  userId: z.string().uuid('ID do usuário deve ser um UUID válido'),
 });
 export type AssignParams = z.infer<typeof assignParamsSchema>;
+
+export const assignBodySchema = z.object({
+  assignedToId: z.string().uuid('ID do usuário deve ser um UUID válido'),
+  dueDate: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
+    message: 'Data inválida. Use formato ISO 8601 (ex: 2026-04-04T15:30:00Z)',
+  }),
+});
+export type AssignBodyDTO = z.infer<typeof assignBodySchema>;
 
 export const updateDueDateParamsSchema = z.object({
   id: z.string().uuid('ID da não conformidade deve ser um UUID válido'),

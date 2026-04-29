@@ -5,6 +5,7 @@ import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
 import { InvalidCredentialsError } from 'errors/invalid-credentials.error';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NcMissingAssigneeError } from 'errors/nc-missing-assignee.error';
+import { NonConformityMissingAssignmentRequirementsError } from 'errors/non-conformity-missing-assignment-requirements.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
 import { NonConformityNumberAlreadyExistsError } from 'errors/nc-number-already-exists.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
@@ -50,6 +51,7 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
   if (
     error instanceof InvalidNonConformityStatusTransitionError ||
     error instanceof NonConformityMissingRootCauseError ||
+    error instanceof NonConformityMissingAssignmentRequirementsError ||
     error instanceof NcMissingAssigneeError ||
     error instanceof CorrectiveActionMissingEvidenceError
   ) {
