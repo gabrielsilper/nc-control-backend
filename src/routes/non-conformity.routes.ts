@@ -6,6 +6,7 @@ import { validateProfileAuth } from 'middlewares/validate-profile-auth.middlewar
 import { validateQuery } from 'middlewares/validate-query.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import CorrectiveActionRepository from 'repositories/corrective-action.repository';
+import NcHistoryRepository from 'repositories/nc-history.repository';
 import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
 import { createCorrectiveActionParamsSchema } from 'schemas/corrective-action-params.schema';
 import { createCorrectiveActionSchema } from 'schemas/create-corrective-action.schema';
@@ -24,6 +25,7 @@ import {
 } from 'schemas/update-corrective-action.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import CorrectiveActionService from 'services/corrective-action.service';
+import NcHistoryService from 'services/nc-history.service';
 import { TokenService } from 'services/token.service';
 import NonConformityController from '../controllers/non-conformity.controller';
 import NonConformityRepository from '../repositories/non-conformity.repository';
@@ -38,7 +40,9 @@ const userService = new UserService(userRepository, encrypter);
 const nonConformityRepository = new NonConformityRepository();
 const ncYearSequenceRepository = new NcYearSequenceRepository();
 const correctiveActionRepository = new CorrectiveActionRepository();
-const nonConformityService = new NonConformityService(nonConformityRepository, ncYearSequenceRepository, userService);
+const ncHistoryRepository = new NcHistoryRepository();
+const ncHistoryService = new NcHistoryService(ncHistoryRepository);
+const nonConformityService = new NonConformityService(nonConformityRepository, ncYearSequenceRepository, userService, ncHistoryService);
 const correctiveActionService = new CorrectiveActionService(correctiveActionRepository, nonConformityService, userService);
 const nonConformityController = new NonConformityController(nonConformityService, correctiveActionService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(new TokenService());
@@ -58,6 +62,10 @@ nonConformityRoutes.get('/counts', validateProfileAuth(Profile.GESTOR), (req, re
 );
 nonConformityRoutes.get('/ranking', validateProfileAuth(Profile.GESTOR), validateQuery(rankingLimitQuerySchema), (req, res) =>
   nonConformityController.getDashboardTypeRanking(req, res),
+);
+
+nonConformityRoutes.get('/:id/history', validateParams(findByIdParamsSchema), (req, res) =>
+  nonConformityController.getHistory(req, res),
 );
 
 nonConformityRoutes.get('/:id', validateParams(findByIdParamsSchema), (req, res) => nonConformityController.findById(req, res));
