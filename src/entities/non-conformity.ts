@@ -1,7 +1,8 @@
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import NcHistory from './nc-history';
 import User from './user';
 
 @Entity('non-conformities')
@@ -69,4 +70,7 @@ export default class NonConformity {
 
   @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
   closedAt?: Date | null;
+
+  @OneToMany(() => NcHistory, (history) => history.nonConformity)
+  histories!: NcHistory[];
 }

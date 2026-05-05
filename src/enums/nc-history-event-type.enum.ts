@@ -1,0 +1,8 @@
+export enum NcHistoryEventType {
+  CREATED,
+  STATUS_CHANGED,
+  ASSIGNEE_SET,
+  ASSIGNEE_CHANGED,
+  DUE_DATE_UPDATED,
+  FIELDS_UPDATED,
+}

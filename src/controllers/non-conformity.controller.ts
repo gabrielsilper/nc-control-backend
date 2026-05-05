@@ -1,6 +1,7 @@
 import ResponseNonConformitiesPageDTO from 'dtos/response-non-conformities-page.dto';
 import { Request, Response } from 'express';
 import { correctiveActionToResponseDto } from 'mappers/corrective-action.mapper';
+import { ncHistoryToResponseDto } from 'mappers/nc-history.mapper';
 import { nonConformityToResponseDto } from 'mappers/non-conformity.mapper';
 import { CreateCorrectiveActionParams } from 'schemas/corrective-action-params.schema';
 import { CreateCorrectiveActionDTO } from 'schemas/create-corrective-action.schema';
@@ -85,34 +86,44 @@ export default class NonConformityController {
   }
 
   async update(req: Request, res: Response) {
+    const { sub } = req.payload;
     const { id } = req.validatedParams as FindByIdParams;
     const updateData = req.body as UpdateNonConformityDTO;
 
-    const nonConformity = await this.nonConformityService.update(id, updateData);
+    const nonConformity = await this.nonConformityService.update(id, sub, updateData);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async assign(req: Request, res: Response) {
+    const { sub } = req.payload;
     const { id } = req.validatedParams as AssignParams;
     const { assignedToId, dueDate } = req.body as AssignBodyDTO;
 
-    const nonConformity = await this.nonConformityService.assign(id, assignedToId, new Date(dueDate));
+    const nonConformity = await this.nonConformityService.assign(id, sub, assignedToId, new Date(dueDate));
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async updateDueDate(req: Request, res: Response) {
+    const { sub } = req.payload;
     const { id, date } = req.validatedParams as UpdateDueDateParams;
     const dueDate = new Date(date);
 
-    const nonConformity = await this.nonConformityService.updateDueDate(id, dueDate);
+    const nonConformity = await this.nonConformityService.updateDueDate(id, sub, dueDate);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
   async updateStatus(req: Request, res: Response) {
+    const { sub } = req.payload;
     const { id, status } = req.validatedParams as UpdateStatusParams;
 
-    const nonConformity = await this.nonConformityService.updateStatus(id, status);
+    const nonConformity = await this.nonConformityService.updateStatus(id, sub, status);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
+  }
+
+  async getHistory(req: Request, res: Response) {
+    const { id } = req.validatedParams as FindByIdParams;
+    const history = await this.nonConformityService.getHistory(id);
+    return res.status(200).json(history.map(ncHistoryToResponseDto));
   }
 
   async getDashboardCounts(_req: Request, res: Response) {
