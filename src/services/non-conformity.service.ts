@@ -10,6 +10,7 @@ import NonConformityRepository from 'repositories/non-conformity.repository';
 import { CreateNonConformityDTO } from 'schemas/create-non-conformity.schema';
 import { FindNonConformitiesQuery } from 'schemas/non-conformities-queries.schema';
 import { UpdateNonConformityDTO } from 'schemas/update-non-conformity.schema';
+import NcHistoryService from './nc-history.service';
 import UserService from './user.service';
 
 export default class NonConformityService {
@@ -17,6 +18,7 @@ export default class NonConformityService {
     private readonly nonConformityRepository: NonConformityRepository,
     private readonly ncYearSequenceRepository: NcYearSequenceRepository,
     private readonly userService: UserService,
+    private readonly ncHistoryService: NcHistoryService,
   ) {}
 
   async create(userId: string, nonConformityData: CreateNonConformityDTO) {
@@ -29,7 +31,9 @@ export default class NonConformityService {
       createdBy: user,
     });
 
-    return this.nonConformityRepository.save(nonConformity);
+    const saved = await this.nonConformityRepository.save(nonConformity);
+    await this.ncHistoryService.recordCreated(saved.id, userId, { number: saved.number, title: saved.title });
+    return saved;
   }
 
   async findAll(filters: FindNonConformitiesQuery) {
@@ -125,21 +129,26 @@ export default class NonConformityService {
     return nonConformity;
   }
 
-  async update(id: string, nonConformityData: UpdateNonConformityDTO) {
+  async update(id: string, userId: string, nonConformityData: UpdateNonConformityDTO) {
     const nonConformity = await this.findById(id);
     const { status, ...restOfData } = nonConformityData;
 
-    const UpdatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
-    const savedNonConformity = await this.nonConformityRepository.save(UpdatedNonConformity);
+    const changedFields = Object.keys(restOfData).filter((k) => restOfData[k as keyof typeof restOfData] !== undefined);
+    const updatedNonConformity = this.nonConformityRepository.merge(nonConformity, restOfData);
+    const savedNonConformity = await this.nonConformityRepository.save(updatedNonConformity);
+
+    if (changedFields.length > 0) {
+      await this.ncHistoryService.recordFieldsUpdated(id, userId, changedFields);
+    }
 
     if (status === undefined) {
       return savedNonConformity;
     }
 
-    return this.updateStatus(id, status);
+    return this.updateStatus(id, userId, status);
   }
 
-  async updateStatus(id: string, nextStatus: StatusNc) {
+  async updateStatus(id: string, userId: string, nextStatus: StatusNc) {
     const nonConformity = await this.findById(id);
     const currentStatus = nonConformity.status;
 
@@ -162,31 +171,51 @@ export default class NonConformityService {
     nonConformity.closedAt = nextStatus === StatusNc.ENCERRADA ? new Date() : null;
     nonConformity.status = nextStatus;
 
-    return this.nonConformityRepository.save(nonConformity);
+    const saved = await this.nonConformityRepository.save(nonConformity);
+    await this.ncHistoryService.recordStatusChanged(id, userId, currentStatus, nextStatus);
+    return saved;
   }
 
-  async assign(id: string, userId: string, dueDate: Date) {
+  async assign(id: string, userId: string, assignedToId: string, dueDate: Date) {
     const nonConformity = await this.findById(id);
-    this.ensureAssignmentRequirements(userId, dueDate);
+    this.ensureAssignmentRequirements(assignedToId, dueDate);
 
-    const user = await this.userService.findById(userId);
+    const previousAssignee = nonConformity.assignedTo ?? null;
+    const newAssignee = await this.userService.findById(assignedToId);
+    const previousStatus = nonConformity.status;
 
-    nonConformity.assignedTo = user;
+    nonConformity.assignedTo = newAssignee;
     nonConformity.dueDate = dueDate;
 
     if (nonConformity.status === StatusNc.ABERTA) {
       nonConformity.status = StatusNc.EM_TRATAMENTO;
     }
 
-    return this.nonConformityRepository.save(nonConformity);
+    const saved = await this.nonConformityRepository.save(nonConformity);
+
+    await this.ncHistoryService.recordAssigned(id, userId, previousAssignee, newAssignee, dueDate);
+
+    if (previousStatus === StatusNc.ABERTA) {
+      await this.ncHistoryService.recordStatusChanged(id, userId, StatusNc.ABERTA, StatusNc.EM_TRATAMENTO);
+    }
+
+    return saved;
   }
 
-  async updateDueDate(id: string, dueDate: Date) {
+  async updateDueDate(id: string, userId: string, dueDate: Date) {
     const nonConformity = await this.findById(id);
+    const previousDueDate = nonConformity.dueDate;
 
     nonConformity.dueDate = dueDate;
 
-    return this.nonConformityRepository.save(nonConformity);
+    const saved = await this.nonConformityRepository.save(nonConformity);
+    await this.ncHistoryService.recordDueDateUpdated(id, userId, previousDueDate, dueDate);
+    return saved;
+  }
+
+  async getHistory(ncId: string) {
+    await this.findById(ncId);
+    return this.ncHistoryService.findByNcId(ncId);
   }
 
   async getDashboardCounts() {
