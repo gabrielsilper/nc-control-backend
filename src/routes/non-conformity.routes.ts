@@ -19,10 +19,7 @@ import {
   updateDueDateParamsSchema,
   updateStatusParamsSchema,
 } from 'schemas/non-conformity-params.schema';
-import {
-  updateCorrectiveActionParamsSchema,
-  updateCorrectiveActionSchema,
-} from 'schemas/update-corrective-action.schema';
+import { updateCorrectiveActionParamsSchema, updateCorrectiveActionSchema } from 'schemas/update-corrective-action.schema';
 import { updateNonConformitySchema } from 'schemas/update-non-conformity.schema';
 import CorrectiveActionService from 'services/corrective-action.service';
 import NcHistoryService from 'services/nc-history.service';
@@ -42,7 +39,12 @@ const ncYearSequenceRepository = new NcYearSequenceRepository();
 const correctiveActionRepository = new CorrectiveActionRepository();
 const ncHistoryRepository = new NcHistoryRepository();
 const ncHistoryService = new NcHistoryService(ncHistoryRepository);
-const nonConformityService = new NonConformityService(nonConformityRepository, ncYearSequenceRepository, userService, ncHistoryService);
+const nonConformityService = new NonConformityService(
+  nonConformityRepository,
+  ncYearSequenceRepository,
+  userService,
+  ncHistoryService,
+);
 const correctiveActionService = new CorrectiveActionService(correctiveActionRepository, nonConformityService, userService);
 const nonConformityController = new NonConformityController(nonConformityService, correctiveActionService);
 const validateTokenMiddleware = new ValidateTokenMiddleware(new TokenService());
@@ -78,8 +80,11 @@ nonConformityRoutes.put(
   (req, res) => nonConformityController.update(req, res),
 );
 
-nonConformityRoutes.patch('/:id/status/:status', validateProfileAuth(Profile.RESPONSAVEL), validateParams(updateStatusParamsSchema), (req, res) =>
-  nonConformityController.updateStatus(req, res),
+nonConformityRoutes.patch(
+  '/:id/status/:status',
+  validateProfileAuth(Profile.RESPONSAVEL),
+  validateParams(updateStatusParamsSchema),
+  (req, res) => nonConformityController.updateStatus(req, res),
 );
 nonConformityRoutes.patch(
   '/:id/assign',
@@ -88,8 +93,11 @@ nonConformityRoutes.patch(
   validateBody(assignBodySchema),
   (req, res) => nonConformityController.assign(req, res),
 );
-nonConformityRoutes.patch('/:id/due-date/:date', validateProfileAuth(Profile.GESTOR), validateParams(updateDueDateParamsSchema), (req, res) =>
-  nonConformityController.updateDueDate(req, res),
+nonConformityRoutes.patch(
+  '/:id/due-date/:date',
+  validateProfileAuth(Profile.GESTOR),
+  validateParams(updateDueDateParamsSchema),
+  (req, res) => nonConformityController.updateDueDate(req, res),
 );
 
 nonConformityRoutes.post(

@@ -71,6 +71,9 @@ export default class NonConformity {
   @Column({ type: 'timestamptz', nullable: true, name: 'closed_at' })
   closedAt?: Date | null;
 
-  @OneToMany(() => NcHistory, (history) => history.nonConformity)
+  @OneToMany(
+    () => NcHistory,
+    (history) => history.nonConformity,
+  )
   histories!: NcHistory[];
 }

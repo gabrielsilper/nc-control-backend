@@ -2,8 +2,8 @@ import { SeverityNc } from 'enums/severity_nc.enum';
 import { allowedTransitions, StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
-import { NonConformityMissingAssignmentRequirementsError } from 'errors/non-conformity-missing-assignment-requirements.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
+import { NonConformityMissingAssignmentRequirementsError } from 'errors/non-conformity-missing-assignment-requirements.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
 import NonConformityRepository from 'repositories/non-conformity.repository';
@@ -64,7 +64,7 @@ export default class NonConformityService {
     if (expired !== undefined) {
       if (expired) {
         queryBuilder.andWhere('nonConformity.dueDate IS NOT NULL AND nonConformity.dueDate < NOW()');
-        queryBuilder.andWhere('nonConformity.status not in (:...status)', { status: [StatusNc.CANCELADA, StatusNc.ENCERRADA]})
+        queryBuilder.andWhere('nonConformity.status not in (:...status)', { status: [StatusNc.CANCELADA, StatusNc.ENCERRADA] });
       } else {
         queryBuilder.andWhere('(nonConformity.dueDate IS NULL OR nonConformity.dueDate >= NOW())');
       }
