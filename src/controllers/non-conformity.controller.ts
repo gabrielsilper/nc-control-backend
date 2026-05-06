@@ -34,12 +34,7 @@ export default class NonConformityController {
     const { ncId } = req.params as CreateCorrectiveActionParams;
     const correctiveActionData = req.body as CreateCorrectiveActionDTO;
 
-    const newCorrectiveAction = await this.correctiveActionService.create(
-      ncId,
-      sub,
-      profile,
-      correctiveActionData,
-    );
+    const newCorrectiveAction = await this.correctiveActionService.create(ncId, sub, profile, correctiveActionData);
     return res.status(201).json(correctiveActionToResponseDto(newCorrectiveAction));
   }
 

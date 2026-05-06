@@ -1,6 +1,6 @@
+import User from 'entities/user';
 import { NcHistoryEventType } from 'enums/nc-history-event-type.enum';
 import { StatusNc } from 'enums/status_nc.enum';
-import User from 'entities/user';
 import NcHistoryRepository from 'repositories/nc-history.repository';
 
 export default class NcHistoryService {
@@ -26,13 +26,7 @@ export default class NcHistoryService {
     return this.ncHistoryRepository.save(history);
   }
 
-  async recordAssigned(
-    ncId: string,
-    actorId: string,
-    previousAssignee: User | null,
-    newAssignee: User,
-    dueDate: Date,
-  ) {
+  async recordAssigned(ncId: string, actorId: string, previousAssignee: User | null, newAssignee: User, dueDate: Date) {
     const isReplacement = previousAssignee !== null;
     const history = this.ncHistoryRepository.create({
       ncId,
@@ -40,8 +34,8 @@ export default class NcHistoryService {
       eventType: isReplacement ? NcHistoryEventType.ASSIGNEE_CHANGED : NcHistoryEventType.ASSIGNEE_SET,
       metadata: isReplacement
         ? {
-            previousAssigneeId: previousAssignee!.id,
-            previousAssigneeName: previousAssignee!.name,
+            previousAssigneeId: previousAssignee?.id,
+            previousAssigneeName: previousAssignee?.name,
             newAssigneeId: newAssignee.id,
             newAssigneeName: newAssignee.name,
             dueDate,

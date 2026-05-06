@@ -12,7 +12,10 @@ export default class NcHistory {
   @Column({ type: 'uuid', name: 'nc_id' })
   ncId!: string;
 
-  @ManyToOne(() => NonConformity, (nc) => nc.histories)
+  @ManyToOne(
+    () => NonConformity,
+    (nc) => nc.histories,
+  )
   @JoinColumn({ name: 'nc_id' })
   nonConformity!: NonConformity;
 

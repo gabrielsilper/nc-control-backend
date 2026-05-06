@@ -27,12 +27,7 @@ export default class CorrectiveActionService {
     });
   }
 
-  async create(
-    nonConformityId: string,
-    userId: string,
-    profile: Profile,
-    correctiveActionData: CreateCorrectiveActionDTO,
-  ) {
+  async create(nonConformityId: string, userId: string, profile: Profile, correctiveActionData: CreateCorrectiveActionDTO) {
     const nonConformity = await this.nonConformityService.findById(nonConformityId);
 
     if (!nonConformity.assignedToId) {
@@ -78,6 +73,9 @@ export default class CorrectiveActionService {
     if (dto.evidence !== undefined) {
       action.evidence = dto.evidence;
     }
+    if (dto.deadline !== undefined) {
+      action.deadline = new Date(dto.deadline);
+    }
 
     if (!wasDone && willBeDone) {
       action.finishedAt = new Date();
@@ -88,11 +86,7 @@ export default class CorrectiveActionService {
     return this.correctiveActionRepository.save(action);
   }
 
-  private ensureCanManageActionPlan(
-    ncAssignedToId: string | null | undefined,
-    userId: string,
-    profile: Profile,
-  ) {
+  private ensureCanManageActionPlan(ncAssignedToId: string | null | undefined, userId: string, profile: Profile) {
     if (profile === Profile.GESTOR) {
       return;
     }
