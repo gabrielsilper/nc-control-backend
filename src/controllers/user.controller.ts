@@ -2,15 +2,16 @@ import { Request, Response } from 'express';
 import { userToResponseDto } from 'mappers/user.mapper';
 import { CreateUserDTO } from '../schemas/create-user.schema';
 import { UpdateUserDTO } from '../schemas/update-user.schema';
+import { FindUsersQuery } from '../schemas/user-queries.schema';
 import UserService from '../services/user.service';
 
 export default class UserController {
   constructor(private userService: UserService) {}
 
-  async getAll(_req: Request, res: Response) {
-    const users = await this.userService.findAll();
-    const usersDto = users.map((user) => userToResponseDto(user));
-    return res.json(usersDto);
+  async getAll(req: Request, res: Response) {
+    const filters = req.validatedQuery as FindUsersQuery;
+    const users = await this.userService.findAll(filters);
+    return res.json(users.map((user) => userToResponseDto(user)));
   }
 
   async getById(req: Request, res: Response) {

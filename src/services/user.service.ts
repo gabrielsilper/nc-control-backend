@@ -5,6 +5,7 @@ import UserRepository from 'repositories/user.repository';
 import User from '../entities/user';
 import { CreateUserDTO } from '../schemas/create-user.schema';
 import { UpdateUserDTO } from '../schemas/update-user.schema';
+import { FindUsersQuery } from '../schemas/user-queries.schema';
 
 export default class UserService {
   constructor(
@@ -12,8 +13,20 @@ export default class UserService {
     private readonly encrypter: IEncrypterService,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(filters: FindUsersQuery): Promise<User[]> {
+    const { profile, search } = filters;
+
+    const qb = this.userRepository.createQueryBuilder('user');
+
+    if (profile !== undefined) {
+      qb.andWhere('user.profile = :profile', { profile });
+    }
+
+    if (search) {
+      qb.andWhere('(user.name ILIKE :search OR user.email ILIKE :search)', { search: `%${search}%` });
+    }
+
+    return qb.getMany();
   }
 
   async findById(id: string): Promise<User> {
