@@ -2,10 +2,12 @@ import { Profile } from 'enums/profile.enum';
 import { Router } from 'express';
 import { validateBody } from 'middlewares/validate-body.middleware';
 import { validateProfileAuth } from 'middlewares/validate-profile-auth.middleware';
+import { validateQuery } from 'middlewares/validate-query.middleware';
 import { validateSelfOrGestor } from 'middlewares/validate-self-or-gestor.middleware';
 import { ValidateTokenMiddleware } from 'middlewares/validate-token.middleware';
 import { createUserSchema } from 'schemas/create-user.schema';
 import { updateUserSchema } from 'schemas/update-user.schema';
+import { findUsersQuerySchema } from 'schemas/user-queries.schema';
 import { TokenService } from 'services/token.service';
 import UserController from '../controllers/user.controller';
 import UserRepository from '../repositories/user.repository';
@@ -46,6 +48,7 @@ userRoutes.get(
   '/',
   (req, res, next) => validateTokenMiddleware.handle(req, res, next),
   validateProfileAuth(Profile.GESTOR),
+  validateQuery(findUsersQuerySchema),
   (req, res) => userController.getAll(req, res),
 );
 userRoutes.delete(
