@@ -81,11 +81,11 @@ export default class NonConformityController {
   }
 
   async update(req: Request, res: Response) {
-    const { sub } = req.payload;
+    const { sub, profile } = req.payload;
     const { id } = req.validatedParams as FindByIdParams;
     const updateData = req.body as UpdateNonConformityDTO;
 
-    const nonConformity = await this.nonConformityService.update(id, sub, updateData);
+    const nonConformity = await this.nonConformityService.update(id, sub, profile, updateData);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
@@ -108,10 +108,10 @@ export default class NonConformityController {
   }
 
   async updateStatus(req: Request, res: Response) {
-    const { sub } = req.payload;
+    const { sub, profile } = req.payload;
     const { id, status } = req.validatedParams as UpdateStatusParams;
 
-    const nonConformity = await this.nonConformityService.updateStatus(id, sub, status);
+    const nonConformity = await this.nonConformityService.updateStatus(id, sub, profile, status);
     return res.status(200).json(nonConformityToResponseDto(nonConformity));
   }
 
