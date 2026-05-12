@@ -1,4 +1,5 @@
 import { CorrectiveActionForbiddenError } from 'errors/corrective-action-forbidden.error';
+import { NonConformityForbiddenError } from 'errors/non-conformity-forbidden.error';
 import { CorrectiveActionMissingEvidenceError } from 'errors/corrective-action-missing-evidence.error';
 import { CorrectiveActionNotFoundError } from 'errors/corrective-action-not-found.error';
 import { EmailAlreadyExistsError } from 'errors/email-already-exists.error';
@@ -34,7 +35,7 @@ export function errorHandler(error: Error, _req: Request, res: Response, _next: 
     });
   }
 
-  if (error instanceof CorrectiveActionForbiddenError) {
+  if (error instanceof CorrectiveActionForbiddenError || error instanceof NonConformityForbiddenError) {
     return res.status(403).json({
       error: error.name,
       message: error.message,

@@ -1,8 +1,10 @@
+import { Profile } from 'enums/profile.enum';
 import { SeverityNc } from 'enums/severity_nc.enum';
 import { allowedTransitions, StatusNc } from 'enums/status_nc.enum';
 import { TypeNc } from 'enums/type_nc.enum';
 import { InvalidNonConformityStatusTransitionError } from 'errors/invalid-non-conformity-status-transition.error';
 import { NonConformityMissingRootCauseError } from 'errors/nc-missing-root-cause.error';
+import { NonConformityForbiddenError } from 'errors/non-conformity-forbidden.error';
 import { NonConformityMissingAssignmentRequirementsError } from 'errors/non-conformity-missing-assignment-requirements.error';
 import { NonConformityNotFoundError } from 'errors/non-conformity-not-found.error';
 import NcYearSequenceRepository from 'repositories/nc-year-sequence.repository';
@@ -129,8 +131,10 @@ export default class NonConformityService {
     return nonConformity;
   }
 
-  async update(id: string, userId: string, nonConformityData: UpdateNonConformityDTO) {
+  async update(id: string, userId: string, profile: Profile, nonConformityData: UpdateNonConformityDTO) {
     const nonConformity = await this.findById(id);
+    this.ensureCanEditNc(nonConformity, userId, profile);
+
     const { status, ...restOfData } = nonConformityData;
 
     const changedFields = Object.keys(restOfData).filter((k) => restOfData[k as keyof typeof restOfData] !== undefined);
@@ -145,11 +149,13 @@ export default class NonConformityService {
       return savedNonConformity;
     }
 
-    return this.updateStatus(id, userId, status);
+    return this.updateStatus(id, userId, profile, status);
   }
 
-  async updateStatus(id: string, userId: string, nextStatus: StatusNc) {
+  async updateStatus(id: string, userId: string, profile: Profile, nextStatus: StatusNc) {
     const nonConformity = await this.findById(id);
+    this.ensureCanEditNc(nonConformity, userId, profile);
+
     const currentStatus = nonConformity.status;
 
     if (currentStatus === nextStatus) {
@@ -272,6 +278,12 @@ export default class NonConformityService {
 
   private getCurrentMonth() {
     return new Date().getMonth() + 1;
+  }
+
+  private ensureCanEditNc(nc: { assignedToId?: string | null }, userId: string, profile: Profile) {
+    if (profile === Profile.GESTOR) return;
+    if (nc.assignedToId && nc.assignedToId === userId) return;
+    throw new NonConformityForbiddenError();
   }
 
   private ensureAssignmentRequirements(assignedToId?: string | null, dueDate?: Date | null) {

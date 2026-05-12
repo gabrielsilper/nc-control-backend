@@ -10,9 +10,20 @@ export const createCorrectiveActionSchema = z.object({
     message: 'status deve ser um valor de enum válido: 0 - PENDENTE, 1 - EM_ANDAMENTO, 2 - CONCLUIDA',
   }),
 
-  deadline: z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
-    message: 'deadline com data inválida. Use formato ISO 8601 (ex: 2026-04-04T15:30:00Z)',
-  }),
+  deadline: z
+    .string()
+    .refine((val) => !Number.isNaN(Date.parse(val)), {
+      message: 'deadline com data inválida. Use formato ISO 8601 (ex: 2026-04-04T15:30:00Z)',
+    })
+    .refine(
+      (val) => {
+        const date = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+      },
+      { message: 'O prazo não pode ser uma data passada.' },
+    ),
 
   evidence: z.string('evidence deve ser uma string').min(3, 'evidence deve ter no mínimo 3 caracteres').optional(),
 });
