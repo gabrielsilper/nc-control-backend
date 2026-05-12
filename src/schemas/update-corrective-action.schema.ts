@@ -16,6 +16,15 @@ export const updateCorrectiveActionSchema = z
       .refine((val) => !Number.isNaN(Date.parse(val)), {
         message: 'deadline com data inválida. Use formato ISO 8601 (ex: 2026-04-04T23:59:59-03:00)',
       })
+      .refine(
+        (val) => {
+          const date = new Date(val);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date >= today;
+        },
+        { message: 'O prazo não pode ser uma data passada.' },
+      )
       .optional(),
   })
   .refine((data) => data.status !== undefined || data.evidence !== undefined || data.deadline !== undefined, {
