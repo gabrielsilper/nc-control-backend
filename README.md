@@ -302,7 +302,7 @@ Todos os endpoints requerem autenticação.
 |--------|------|---------------|-----------|
 | POST | `/non-conformities` | Qualquer | Registrar NC |
 | GET | `/non-conformities` | Qualquer | Listar com filtros |
-| GET | `/non-conformities/my-queue` | Qualquer | Fila atribuída ao usuário |
+| GET | `/non-conformities/my-queue` | RESPONSAVEL | Fila atribuída ao usuário |
 | GET | `/non-conformities/counts` | GESTOR | Contagens para o dashboard |
 | GET | `/non-conformities/ranking` | GESTOR | Ranking de NCs por tipo |
 | GET | `/non-conformities/:id` | Qualquer | Buscar por ID |
@@ -313,7 +313,7 @@ Todos os endpoints requerem autenticação.
 | PATCH | `/non-conformities/:id/due-date/:date` | GESTOR | Definir prazo |
 | POST | `/non-conformities/:ncId/corrective-actions` | RESPONSAVEL | Criar ação corretiva |
 | GET | `/non-conformities/:ncId/corrective-actions` | Qualquer | Listar ações corretivas |
-| PATCH | `/non-conformities/:ncId/corrective-actions/:caId` | Qualquer | Atualizar ação corretiva |
+| PATCH | `/non-conformities/:ncId/corrective-actions/:caId` | RESPONSAVEL | Atualizar ação corretiva |
 
 #### Criar NC
 
